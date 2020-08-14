@@ -1,0 +1,32 @@
+{
+  "name": "WebSpider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node src/crawler.ts",
+    "dev:build": "tsc -w",
+    "dev:start": "nodemon  build/crawler.js",
+    "dev": "concurrently \"npm run dev:build\" \"npm run dev:start\""
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "data/*"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/superagent": "^4.1.9",
+    "cheerio": "^1.0.0-rc.3",
+    "concurrently": "^5.3.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@types/cheerio": "^0.22.21",
+    "@types/node": "^14.0.27",
+    "superagent": "^6.0.0"
+  }
+}

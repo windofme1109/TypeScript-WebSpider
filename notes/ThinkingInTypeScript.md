@@ -1,0 +1,596 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [对TypeScript的一些理解](#%E5%AF%B9typescript%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3)
+  - [1. TypeScript中的类型](#1-typescript%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%9E%8B)
+  - [2. 类型注解和类型推断](#2-%E7%B1%BB%E5%9E%8B%E6%B3%A8%E8%A7%A3%E5%92%8C%E7%B1%BB%E5%9E%8B%E6%8E%A8%E6%96%AD)
+  - [3. 函数相关类型](#3-%E5%87%BD%E6%95%B0%E7%9B%B8%E5%85%B3%E7%B1%BB%E5%9E%8B)
+  - [4. 函数的定义](#4-%E5%87%BD%E6%95%B0%E7%9A%84%E5%AE%9A%E4%B9%89)
+  - [5. 数组与元组](#5-%E6%95%B0%E7%BB%84%E4%B8%8E%E5%85%83%E7%BB%84)
+  - [6. 接口](#6-%E6%8E%A5%E5%8F%A3)
+  - [7. 类](#7-%E7%B1%BB)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## 对TypeScript的一些理解
+
+### 1. TypeScript中的类型
+
+1. 静态类型  
+   指的是在定义一个变量时，我们就已经确定了它的类型，比如说是number，或者是string。这样程序运行过程中，变量的类型不会改变，避免了因为不注意类型而导致的程序的异常。同时，IDE还能给出智能提示，提示这类型下具有哪些方法和属性。非常方便我们的开发。
+
+2. 基本类型  
+   `number`、`string`、`undefined`、`null`、`void`、`symbol`
+
+3. 对象类型  
+   `Array`、`function`、`object`、`Class`
+
+4. 声明同时赋值，TS会推断出变量的类型。如果先声明，再赋值，TS推断不出这个变量的具体类型。只会推断其为`any`类型。如下所示：
+   ```typescript
+      let num;
+      num = 1;
+   ```
+   **总结**：如果声明的时候不赋值，那么就要指定参数的类型。
+5. 如果变量再程序运行的过程中，需要改变类型，比如说由数字变为字符串，则我们在定义的时候，最好使用联合类型对这个变量进行约束。
+
+### 2. 类型注解和类型推断
+
+1. 类型注解（type annotation）  
+我们在定义变量的时候，确定变量的类型，如：`let num: number = 1;`，我们明确告诉TS变量`num`是什么类型。这种就是类型注解。
+
+2. 类型推断（type inference）  
+我们在定义变量的时候，不指定变量的类型，而是由TS去推断这个变量的类型。比如：`let num = 1;`，TS就能推断出这个变量是什么类型的，这种情况就是类型推断。
+
+3. 类型推断与类型注解的使用
+   - 如果TS能自动分析变量的类型，那么我们就不需要显式的定义变量的类型了。如number、string等。如：
+     ```typescript
+        let obj = {
+             name: '123',
+             age: 18
+        }    
+     ```
+     虽然没有指定obj的类型，但是TS会推断出obj内部name和age的类型。
+   - 如果TS不能自动分析变量的类型，我们需要手动指定变量的类型。比如说，我们定义一个函数，如下所示：
+     ```typescript
+        function addTwoNumbers(first, second) {
+            return first + second;
+        }    
+        let ret = addTwoNumbers(1, 2);
+     ```  
+     这种情况下，TS会推断ret为`any`类型，因为我们没有指定`addTwoNumbers()`的参数的类型。此时我们就需要指定函数参数的类型。如下所示：
+     ```typescript
+        function addTwoNumbers(first: number, second: number) {
+            return first + second;
+        } 
+        let ret = addTwoNumbers(1, 2);
+     ```
+     我们指定了first和second的类型，这样TS就能自动推断出ret为number类型。
+   - 原则就是，能让TS推断就让TS推断，TS推断不出来的，就手动指定类型。
+
+### 3. 函数相关类型
+
+1. 函数最好指定返回值类型，有助于我们发现编写过程的错误。
+
+2. 常见的返回值类型
+   1. 基本类型：number、string等
+   2. 空值：void，表示函数没有返回值
+   3. never，表示函数永远不会执行到最后。这个不太好理解。用代码演示：
+      ```typescript
+         function errorEmitter(): never {
+             throw new Error();
+             console.log('aaa');
+         }
+      ```  
+      这个函数中，执行到`throw new Error();`这句，就会抛出异常，然后函数终止执行，所以后面的语句都执行不到。此时函数的返回值就是`never`。适用于没有返回值，但是执行不完整体的函数。  
+      ps：不知道这个返回值的实际应用场景。
+      
+3. 限定函数的参数类型
+   - 现在我们经常以解构的方式，使用一个对象作为函数的参数，如下所示：
+     ```typescript
+        function addTwoNumbers({first, second}) {
+            return first + second;
+        }
+     ```
+     在这种情况下，如何限定参数的类型呢？也就是上面的first和second参数的类型。
+   - 方法如下：
+     ```typescript
+        function addTwoNumbers({
+          first,
+          second,
+        }: {
+          first: number;
+          second: number;
+        }): number {
+          return first + second;
+        }
+     
+        let total = addTwoNumbers({ first: 1, second: 2 });
+     ```  
+     定义一个接口，并将参数类型指定为这个接口。
+   - 函数只有一个参数时这样定义：
+     ```typescript
+        function getNumbers({ first }: { first: number }): number {
+          return first;
+        }  
+        let count = getNumbers({ first: 1 });
+     ```
+     
+     
+### 4. 函数的定义
+
+1. 使用函数表达式进行定义，有两种方法：
+   - 在定义函数体的时候进行约束：
+     ```typescript
+        const func = (str: string) => {
+          return parseInt(str, 10);
+        };
+     ``` 
+     也就是在等号的右侧进行约束。如果TS能推断出返回值类型，就不需要我们去指定返回值类型。
+   - 在定义变量的时候进行约束：
+     ```typescript
+        const func2: (str: string) => number = (str) => {
+          return parseInt(str, 10);
+        };
+     ```
+     在等号左侧进行约束，也是使用箭头函数的形式。等号右侧直接定义函数体即可。
+     
+     
+     
+### 5. 数组与元组
+
+1. 数组的定义方式有两种：
+   - 类型 + []
+     ```typescript
+        let arr1: number[] = [1, 2, 3];
+        // 联合类型指定数组可以存储多个类型
+        let arr2: (number | string)[] = [1, "2", 3];
+     ```
+   - 接口的方式定义
+     ```typescript
+        let Arr3: Array<number> = [1, 2, 3, 4];
+         // 泛型结合联合类型定义数组
+        let Arr4: Array<number|string> = [1, '2', 3, 4];
+     ```
+     
+2. 定义对象数组：
+   ```typescript
+      class Teacher {
+        name: string;
+        age: number;
+      }
+      
+      let objectArr: Teacher[] = [{ name: "dell", age: 15 }];
+      let objectArr2: Array<Teacher> = [{ name: "dell", age: 15 }];
+   ```
+   
+3. 元组（Tuple）  
+   - 元组的存在意义就是约定数组指定位置的元素的类型。使得数组的不同位置使用不同的类型。这和联合类型定义数组不同，使用联合类型定义数组，不能对具体的位置进行约束，如下所示：
+     ```typescript
+      let Arr5: Array<number | string> = [1, "2", 3, 4];
+      let Arr4: Array<number | string> = [1, "2", '3', 4];
+     ```  
+     任意一个位置都可以定义为number或者是string类型。
+   - 元组可以对数组的每个位置的类型进行约束：
+     ```typescript
+        let teacherInfo: [string, string, number] = ["dell", "king", 18];
+        // error TS2322: Type 'number' is not assignable to type 'string'.
+        // let teacherInfo2: [string, string, number] = ["dell", 15, 18];
+     ```
+   - 利用元组约束数组的元素（二维数组）：
+     ```typescript
+        let teacherList: Array<[string, string, number]> = [
+            ['dell', 'bupt', 18],
+            ['jack', 'csuft', 20],
+        ];
+     ```
+     这种约束方式，常常用在csv文件的存储形式上。
+     
+     
+### 6. 接口
+
+1. 接口中可以定义固定属性、可选属性、任意属性、只读属性。如下所示：
+   ```typescript
+      interface Fruits {
+          name: string;
+          readonly color: string; // 只读属性
+          size?: number; // 可选属性
+          weight: number;
+          [proName: string]: any; // 任意属性，或者这样定义：[proName: string]: number | string;
+      }
+   ```  
+   接口中定义任意属性，而其他的属性的属性值类型有多种类型，如name为string，size为number，则任意属性的属性值的类型必须包括这些类型，所以可以使用联合类型或者any类型，这样才不会报错。
+
+2. 接口用来约束对象形状。固定属性必须有和只读属性必须有，而可选属性和任意属性不一定有。只读属性时在定义对象时就得赋值，此后不可更改。如果先声明，再赋值，也会报错。
+
+3. 接口中可以定义函数，定义了函数，则被约束的对象必须实现这个方法。
+   ```typescript
+      interface Person {
+          name: string;
+          age?: number;
+          say(): string;
+      }
+      
+      let p2: Person = {
+          name: 'smith',
+          say: () => 'hello',
+      };
+   ```
+   
+4. 类可以实现接口。接口中定义的固定属性和方法，再类中必须实现。
+   ```typescript
+      interface Person {
+          name: string;
+          age?: number;
+          say(): string;
+      }   
+      class Teacher implements Person {
+          name = 'jack';
+          age = 18;
+          say() {
+              return this.name;
+          }
+      }
+   ```
+   
+5. 接口直接可以实现继承。
+   ```typescript
+      interface Person {
+          name: string;
+          age?: number;
+      }
+      
+      interface Chinese extends Person {
+          country: string;
+      }
+      
+      let c1: Chinese = {
+          name: 'dell',
+          age: 18,
+          country: 'China',
+      };
+   ```
+   
+6. 接口可以用来定义函数的输入和返回值。
+   ```typescript
+      interface SayHello {
+          (name: string): string;
+      }
+      
+      const hello: SayHello = name => {
+          return `hello, ${name}`;
+      };
+   ```
+   
+7. 接口可以用来定义数组。
+   ```typescript
+      interface Index {
+          [index: number]: number;
+      }
+      
+      let arr: Index = [1, 2, 3];
+   ```
+   
+8. 接口的作用还是1-5，6和7不常用。
+
+### 7. 类
+1. 使用`class`关键字定义一个类。
+
+2. 类可以实现继承。
+
+3. 子类可以重写父类的方法。
+
+4. 子类可以调用父类的属性和方法。
+
+5. 调用一个方法时，会按照原型链的顺序，逐次在子类、父类直到Object上查找。
+   ```typescript
+      class Person {
+          name = 'dell';
+          getName() {
+              return this.name;
+          }
+      }
+      class Teacher extends Person {
+          // name = 'jack';
+          getTeacherName() {
+              return 'jack';
+          }
+          
+          // 子类中重写父类的方法
+          getName(): string {
+              // super表示父类
+              // 使用super可以在子类中调用父类的属性和方法
+              return super.getName() + ' lee';
+          }
+      } 
+      let t = new Teacher();
+      // dell lee
+      console.log(t.getName());
+      // jack
+      console.log(t.getTeacherName());
+   ```
+
+6. super的作用是：super表示父类，使用super可以在子类中调用父类的属性和方法。当我们在子类中重写了父类的方法时，还想调用父类的同名方法，此时就可以使用super进行调用。
+
+7. 修饰符  
+   修饰符的主要作用是限定类中的成员属性和方法的访问范围。
+   - **public**  
+     使用public修饰的成员属性和成员方法，不仅在类的内部可以访问，在类的外部、子类中都可以访问。  
+     成员属性和方法不加任何修饰符，则默认就是public。
+   - **private**  
+     private表示私有，使用private修饰的成员属性和成员方法，只能在类的内部访问，在类的外部、子类中都不可访问，如果访问就会报错。  
+     使用private的目的是将属性和方法封装在类的内部，保证其安全性，使其不能被外界随意访问。体现了面向对象的封装性。  
+     private修饰构造方法，就不能对这个类进行实例化，即不能使用`new`这个关键字。
+   - **protected**  
+     使用protected修饰的成员属性和成员方法，仅在类的内部和子类中可以访问，在类的外部不可访问。
+     
+8. getter和setter
+   - 在类的内部，使用private修饰的变量，类的外部无法访问，所以我们通过设置setter和getter方法，使得我们可以对私有变量可以进行设置和获取。
+     ```typescript
+        class Person {
+            // 在类中，我们约定，以_开头的变量为私有属性
+            // private _name: string;
+            // constructor(name: string) {
+            //     this._name = name;
+            // }
+        
+            // 上面先定义私有属性，后定义构造方法的写法可以简化为一句
+            constructor(private _name: string) {
+                this._name = _name;
+            }
+        
+            get name() {
+                console.log('getter');
+                return this._name;
+            }
+        
+            set name(newName) {
+                console.log('setter');
+                this._name = newName;
+            }
+        }
+        
+        let teacher = new Person('dell');
+        console.log(teacher.name);
+        // console.log(teacher)
+        
+        teacher.name = 'jack';
+        console.log(teacher.name);
+        
+        teacher.name = 'smith';
+        console.log(teacher.name);
+     ```
+   - 对私有属性我们要设置getter和setter方法。
+   - getter和setter方法必须与属性名称相同。
+   - 我们在调用getter或者setter方法时，虽然是方法，但是不用加上小括号，而是像调用属性一样：
+     ```typescript
+        teacher.name = 'jack';
+        console.log(teacher.name);
+     ```
+   - 我们可以在setter方法中对传入的变量进行限制，如果不符合要求，就可以不进行设置。
+     ```typescript
+        class Person {
+            constructor(private _name: string, private _age: number) {
+                // this._name = _name;
+            }
+        
+            get name() {
+                console.log('getter');
+                return this._name;
+            }
+        
+            set name(newName) {
+                console.log('setter');
+                this._name = newName;
+            }
+        
+            get age() {
+                return this._age;
+            }
+        
+            set age(age) {
+                    if (age > 10 && age < 100) {
+                        this._age = age;
+                    }
+                }
+        }
+        
+        let teacher = new Person('dell', 15);
+        console.log(teacher.name);
+        console.log(teacher.age);
+        
+        teacher.age = 5;
+        // 15
+        console.log(teacher.age);
+     ```
+     上例中，我们对age进行了限制，要求age必须在10-100之间，如果不在这个范围，则无法赋值。这体现了设置setter方法的一个好处。
+   - setter和getter方法必须成对出现。
+   
+9. static  
+   使用static修饰的属性和方法为静态属性和静态方法，直接挂载到类上，通过类进行访问，不能通过实例进行访问。
+   
+10. static与单例模式
+    - 单例模式，指的是同一个类只能有一个实例。也就是说，无论使用这个类多少次，最终只能存在一个实例。
+    - 单例模式特点：
+      - 不能使用new关键字
+      - 使用一个静态方法得到实例
+      - 类的内部有一个私有变量来存放这个类唯一的实例
+    - 因为不能使用new关键字，所以我们在类的内部使用static关键字，定义一个静态方法，我们直接通过类调用这个静态方法，得到实例：
+      ```typescript
+         class Demo {
+             // 定义一个私有属性，类型为Demo，用来存放Demo的实例
+             private static instance: Demo;
+         
+             // 使用private修饰构造方法，使得外面不能实例化Demo类
+             private constructor(name: string) {}
+         
+             static getInstance() {
+                 if (!this.instance) {
+                     // 如果实例不存在，就实例化一个，并将其赋值给私有属性：instance
+                     this.instance = new Demo('qinney');
+                 }
+                 return this.instance;
+             }
+         }
+         
+         let d1 = Demo.getInstance();
+         let d2 = Demo.getInstance();
+         // true
+         console.log(d1 === d2);
+      ```
+    - ES5的方式实现单例模式（简版）：
+      ```javascript
+         function Singleton(name) {
+             this.name = name;
+             this.instance = null;
+         }
+         
+         Singleton.prototype.getName = function () {
+             return this.name;
+         };
+         
+         Singleton.getInstance = function (name) {
+             if (!this.instance) {
+                 this.instance = new Singleton(name);
+             }
+         
+             return this.instance;
+         };
+        
+         let s1 = Singleton.getInstance('aaaa');      
+         let s2 = Singleton.getInstance('bbbbb');
+         // true
+         console.log(s1 === s2);
+         // "aaaa"
+         s1.getName()
+         // "aaaa"
+         s2.getName()
+      ```
+      
+11. 抽象类（abstract class）
+    - 将一些类的公共的属性和方法提取出来，封装在抽象类中。这样其他类继承这个抽象类，同时也继承了这些属性和方法。
+    - 抽象类使用`abstract`关键字定义。
+    - 抽象类只能被继承，不能被实例化。
+    - 抽象类中可以使用abstract关键字定义抽象方法，抽象方法只需定义函数名，参数类型和返回值类型，不需要定义函数体。在子类中必须实现这个方法。
+    - 抽象类中可以定义普通方法。
+    - 示例代码如下：
+      ```typescript
+         abstract class Geom {
+             width: number;
+             getType() {
+                 return 'Geom';
+             }
+         
+             // 定义抽象方法
+             abstract getArea(): number;
+         }
+         
+         class Circle extends Geom {
+             private _radius: number;
+             constructor(radius: number) {
+                 super();
+                 this._radius = radius;
+             }
+         
+             // 子类必须实现抽象类中定义的方法
+             getArea(): number {
+                 return Math.PI * this._radius ** 2;
+             }
+         }
+         
+         let c1 = new Circle(5);
+         
+         // the circle's area is  78.53981633974483
+         console.log("the circle's area is ", c1.getArea());
+         // the type is  Geom
+         console.log('the type is ', c1.getType());
+      ```
+      
+12. 只读特性 —— readonly  
+    - 可以给类中的public属性设置一个只读特性，这样我们就只能读取，不能修改这个属性。
+    - 修改只读属性会报错：
+      ```typescript
+         class Person {
+             public readonly name: string;
+             constructor(name: string) {
+                 this.name = name;
+             }
+         }
+         
+         let p1 = new Person('dell');
+         // dell
+         console.log(p1.name);
+         
+         // error TS2540: Cannot assign to 'name' because it is a read-only property.
+         // p1.name = 'jack';
+      ```
+
+### 8. 联合类型和类型保护
+
+1. 联合类型  
+   - 为一个变量指定两个及以上的类型。两个类型之间使用`|`进行分隔。例如：
+     ```typescript
+      const aa: string | number;
+     ```
+   - 联合类型只能引用几个类型共有的属性或者方法。否则就会报错。
+
+2. 类型保护
+   - 我理解的类型保护，指的是如果变量被指定为联合类型，那么我们在使用时只能使用这些类型的共有属性和方法，非常不方便，所以就需要有一种判断机制，将变量判断为具体的类型，从而能够使用这个类型的方法和属性。一共有四种方法：类型断言、in、typeof和instanceof。
+   - 类型断言  
+     使用`as`关键字，将一个变量断言为具体的一个类型。
+     ```typescript
+        interface Bird {
+            fly: boolean;
+            sing(): string;
+        }
+        
+        interface Dog {
+            fly: boolean;
+            bark(): string;
+        }
+     
+        function trainAnimal(animal: Bird | Dog) {
+            if (animal.fly) {
+                return (animal as Bird).sing();
+            } else {
+                return (animal as Dog).bark();
+            }
+        }
+     ```  
+     如果fly属性为`true`，表明这个类为Bird，但是TS不会这么智能，因此，需要我们手动将其指定为一个具体的类型。这里使用类型断言的方式进行指定。
+   - in  
+      判断x属性是否存在于y中。
+      ```typescript
+         function trainAnimal2(animal: Bird | Dog) {
+             if ('sing' in animal) {
+                 return animal.sing();
+             } else {
+                 return animal.bark();
+             }
+         }
+      ```
+   - typeof  
+     判断类型
+     ```typescript
+        function add(first: string | number, second: string | number) {
+            if (typeof first === 'string' || typeof second === 'string') {
+                return `${first}${second}`;
+            }
+            return first + second;
+        }
+     ```  
+     typeof只能判断基本数据类型和函数，对于引用数据类型——对象，都会返回object，这点需要注意。
+   - instanceof  
+     用来判断引用数据类型，判断某个变量是否为某个类的实例。
+     ```typescript
+        function add2(first: object | NumberObj, second: object | NumberObj) {
+            if (first instanceof NumberObj && second instanceof NumberObj) {
+                return first.count + second.count;
+            }
+        
+            return 0;
+        }
+     ```
+     instanceof一般适用于对对象和类关系的判断。
+     
+### 9. 枚举
