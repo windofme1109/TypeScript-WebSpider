@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在浏览器端运行ts文件</title>
+</head>
+<body>
+
+
+</body>
+<!--在TS配置文件时使用AMD规范的模块化方式，所有TS将ts文件编译为AMD规范的模块组织方式，因此需要引入require.js，用来加载AMD规范的代码-->
+<script src="https://cdn.bootcdn.net/ajax/libs/require.js/2.3.6/require.js"></script>
+<script src="./dist/page.js"></script>
+<script>
+    // 涉及到前端的AMD模块化规范，require.js的使用
+    require(['page'], function(page) {
+        // 在page.js文件中，我们最终将变量Page挂在到default这个属性上
+        // exports.default = Page;
+        // 所以，我们要使用page的default属性，进行实例化
+        new page.default();
+    })
+</script>
+</html>
