@@ -324,29 +324,92 @@ function trainAnimal(animal: Bird | Dog) {
 }
 
 // 使用in关键字实现类型保护
-function trainAnimal2(animal: Bird | Dog) {
-    if ('sing' in animal) {
-        return animal.sing();
-    } else {
-        return animal.bark();
-    }
+// function trainAnimal2(animal: Bird | Dog) {
+//     if ('sing' in animal) {
+//         return animal.sing();
+//     } else {
+//         return animal.bark();
+//     }
+// }
+//
+
+// 使用typeof实现类型保护
+// function add(first: string | number, second: string | number) {
+//     if (typeof first === 'string' || typeof second === 'string') {
+//         return `${first}${second}`;
+//     }
+//     return first + second;
+// }
+//
+// class NumberObj {
+//     count: number;
+// }
+//
+
+// 使用instanceof实现类型保护
+// function add2(first: object | NumberObj, second: object | NumberObj) {
+//     if (first instanceof NumberObj && second instanceof NumberObj) {
+//         return first.count + second.count;
+//     }
+//
+//     return 0;
+// }
+
+// // 枚举
+// enum Week {
+//     Sun,
+//     Mon,
+//     Tue,
+//     Wed,
+//     Thu,
+//     Fri,
+//     Sat,
+// }
+//
+// // true
+// console.log(Week['Sun'] === 0);
+// // true
+// console.log(Week[1] === 'Mon');
+//
+// enum Week2 {
+//     Sun = 1,
+//     Mon,
+//     Tue = 4,
+//     Wed,
+//     Thu,
+//     Fri,
+//     Sat,
+// }
+//
+// // true
+// console.log(Week2['Tue'] === 4);
+// // true
+// console.log(Week2[1] === 'Sun');
+// // true
+// console.log(Week2[5] === 'Wed');
+
+// 函数泛型
+function join<T>(first: T, second: T) {
+    return `${first} ${second}`;
 }
 
-function add(first: string | number, second: string | number) {
-    if (typeof first === 'string' || typeof second === 'string') {
-        return `${first}${second}`;
-    }
-    return first + second;
+let ret = join<string>('1', '2');
+// 1 2
+console.log(ret);
+// 11 22
+let ret1 = join<number>(11, 22);
+console.log(ret1);
+
+function join2<T, U>(first: T, second: U) {
+    return `${first} ${second}`;
 }
+let ret2 = join2(1, '2');
 
-class NumberObj {
-    count: number;
+function join3<T>(first: T, second: T): T {
+    return first;
 }
+let ret3 = join3<string>('aaa', '2');
 
-function add2(first: object | NumberObj, second: object | NumberObj) {
-    if (first instanceof NumberObj && second instanceof NumberObj) {
-        return first.count + second.count;
-    }
-
-    return 0;
+function map<T>(param: Array<T>) {
+    return param;
 }
