@@ -594,4 +594,87 @@
      instanceof一般适用于对对象和类关系的判断。
      
 ### 9. 枚举
+1. 枚举通常适用于只有有限几种选择的场景，如一周只有七天，三原色只能是红色、绿色和蓝色等。
+2. 定义枚举使用`enum`定义。
+   ```typescript
+      
+      enum Week {
+          Sun,
+          Mon,
+          Tue,
+          Wed,
+          Thu,
+          Fri,
+          Sat,
+      }
+
+      // true
+      console.log(Week['Sun'] === 0);
+      // true
+      console.log(Week[1] === 'Mon');
+   ```
+   
+3. 访问一个枚举类中的元素，可以通过枚举项所代表的数值的方式，也可以通过字符串的方式。
+
+4. 如果不手动给枚举项赋值，那么从第一个未赋值枚举项开始，默认赋值为0，后面未赋值的元素依次加1。在上例的枚举类`Week`中，，`Sun`赋值为0，`Mon`赋值为1，...，`Sat`赋值为6。
+
+5. 可以手动给枚举项赋值。如果枚举项后面有未赋值的项，那么这个枚举项会在赋值的枚举项的基础上递增，递增的步长为1。
+   ```typescript
+      enum Week2 {
+          Sun = 1,
+          Mon,
+          Tue = 4,
+          Wed,
+          Thu,
+          Fri,
+          Sat,
+      }
+      
+      // true
+      console.log(Week2['Tue'] === 4);
+      // true
+      console.log(Week2[1] === 'Sun');
+      // true
+      console.log(Week2[5] === 'Wed');
+   ```
+    在枚举类`Week2`中，`Sun`被手动赋值为1，而`Mon`没有被赋值，索引默认赋值为2。`Tue`被手动赋值为4，同理，`Wed`会被赋值为5，`Thu`被赋值为6，后面的以此类推。
+    
 ### 10. 函数泛型
+
+1. 在某些情况下，我们定义函数时，不会准确的知道函数的参数和返回值类型，只有在运行时才会明确它们的类型。所以，我们可以在定义函数时使用泛型。
+
+2. 泛型用来约束参数类型：
+   ```typescript
+      function join<T>(first: T, second: T) {
+          return `${first} ${second}`;
+      }
+      
+      let ret = join<string>('1', '2');
+      // 1 2
+      console.log(ret);
+      // 11 22
+      let ret1 = join<number>(11, 22);
+      console.log(ret1);
+   ```
+
+3. 使用多个泛型：
+   ```typescript
+      function join2<T, U>(first: T, second: U) {
+          return `${first} ${second}`;
+      }
+      let ret2 = join2(1, '2');
+   ```
+   T和U定义了两种类型，分别约束不同的参数类型。
+
+4. 可以在使用函数时不指定泛型的具体类型，TS可以类型推断。也可以指定具体的类型。
+
+5. 泛型定义返回值类型：
+   ```typescript
+      function join3<T>(first: T, second: T): T {
+          return first;
+      }
+      let ret3 = join3<string>('aaa', '2');
+   ```
+   这里需要注意的是，返回值被约束为泛型T，所以，这里必须时返回一个T类型的值。
+
+
