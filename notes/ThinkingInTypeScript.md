@@ -593,6 +593,7 @@
      ```
      instanceof一般适用于对对象和类关系的判断。
      
+     
 ### 9. 枚举
 1. 枚举通常适用于只有有限几种选择的场景，如一周只有七天，三原色只能是红色、绿色和蓝色等。
 2. 定义枚举使用`enum`定义。
@@ -639,6 +640,7 @@
    ```
     在枚举类`Week2`中，`Sun`被手动赋值为1，而`Mon`没有被赋值，索引默认赋值为2。`Tue`被手动赋值为4，同理，`Wed`会被赋值为5，`Thu`被赋值为6，后面的以此类推。
     
+    
 ### 10. 函数泛型
 
 1. 在某些情况下，我们定义函数时，不会准确的知道函数的参数和返回值类型，只有在运行时才会明确它们的类型。所以，我们可以在定义函数时使用泛型。
@@ -676,5 +678,150 @@
       let ret3 = join3<string>('aaa', '2');
    ```
    这里需要注意的是，返回值被约束为泛型T，所以，这里必须时返回一个T类型的值。
+   
 
+### 11. 类中使用泛型
 
+1. 在定义类的时候，使用泛型定义，提高了类的灵活性和使用场景。
+
+2. 基本使用
+   ```typescript
+      class DataManager<T> {
+          constructor(private data: T[]) {
+              this.data = data;
+          }
+      
+          getItem(index: number) {
+              return this.data[index];
+          }
+      }
+      
+      const data = new DataManager<string>(['1', '2']);
+      // 2
+      console.log(data.getItem(1));
+   ```
+   
+3. 使用接口对泛型进行约束：
+   ```typescript
+      // 对泛型进行约束
+      interface Item {
+          name: string;
+      }
+      
+      // 泛型继承了Item，则泛型中必须具有name这个属性
+      class DataManager2<T extends Item> {
+          constructor(private data: T[]) {
+              this.data = data;
+          }
+      
+          getItem(index: number): string {
+              return this.data[index].name;
+          }
+      }
+      
+      const data3 = new DataManager2([
+          {
+              name: 'dell',
+          },
+      ]);
+      
+      // dell
+      console.log(data3.getItem(0));
+   ```
+   泛型继承了接口`Item`，则泛型中必须具有name这个属性。适用于泛型为对象的情况。
+
+4. 基本类型对泛型的约束：
+   ```typescript
+      class DataManager3<T extends number | string> {
+          constructor(private data: T[]) {
+              this.data = data;
+          }
+      
+          getItem(index: number): T {
+              return this.data[index];
+          }
+      }
+      
+      const data4 = new DataManager3<string>(['dell', 'lee']);
+      // lee
+      console.log(data4.getItem(1));
+   ```
+   限定了泛型只能为`number`或者`string`，而不能是其他类型。
+
+5. 泛型作为类型对变量进行约束：
+   ```typescript
+      function hello<T>(params: T): T {
+          return params;
+      }
+      
+      const func: <T>(params: T) => T = hello;
+   ```
+   变量`func`是函数类型，用TS中的箭头函数的形式对其进行约束。而`hello`是一个函数，要想赋值给`func`，必须符合等号左边的约束形式。
+
+### 12. 命名空间 —— namespace
+
+1. 命名空间类似于模块化。在一个文件中，只对外暴露出我想暴露的变量、类、函数等。从而避免不同文件引用出现的变量污染、命名冲突等问题。
+
+2. 使用命名空间，首先使用`namespace`关键字，定义一个全局变量，然后将所有的变量、接口、类、函数等统统放入这个全局变量中，在需要导出的变量、接口、类、函数的前面加上export关键字。
+   - 定义命名空间
+     ```typescript
+        // page.ts
+        // 定义一个命名空间
+          namespace Home {
+              class Header {
+                  constructor() {
+                      const div = document.createElement('div');
+                      div.innerHTML = 'This is a Header';
+                      document.body.appendChild(div);
+                  }
+              }
+          
+              class Content {
+                  constructor() {
+                      const div = document.createElement('div');
+                      div.innerHTML = 'This is a Content';
+                      document.body.appendChild(div);
+                  }
+              }
+          
+              class Footer {
+                  constructor() {
+                      const div = document.createElement('div');
+                      div.innerHTML = 'This is a Footer';
+                      document.body.appendChild(div);
+                  }
+              }
+          
+              export class Page {
+                  constructor() {
+                      new Header();
+                      new Content();
+                      new Footer();
+                  }
+              }
+          }
+     ```
+   
+   - 使用命名空间导出的变量
+     ```typescript
+        // 使用命名空间中导出的变量
+        import './Home';
+        new Home.Page();
+     ```
+  
+   - 引入命名空间有两种方式，或者说表明命名空间的一个引用关系：
+     - reference
+       ```typescript
+          /// <referece path='./Home.ts' />
+       ```
+       表明，引用的是同一目录下的Home.ts中的命名空间。path表示的引用的哪个ts文件。  
+       reference必须以三个反斜杠（/）开头。
+     - import
+       ```typescript
+          import './Home.ts'
+       ```  
+       使用ES6的import语法。
+ 
+3. 总结：
+   在项目开发中，最好还是使用ES6的模块化语法，要比命名空间更加清晰，使我们能够清楚的了解每个变量的来历，依赖关系。
+            

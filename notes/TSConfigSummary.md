@@ -15,6 +15,8 @@
    与includes作用相同。
 5. compilerOptions  
    这个字段下有非常多的属性，我们这里选择几个常用的比较重要的字段进行说明。
+   - module   
+     用来指定要使用的模块标准，主要有：'none'、'commonjs'、 'amd'、'system'、'umd'、'es2015'、'es2020' 或者是 'ESNext'。
    - removeComments  
      属性值为布尔值。为`true`的话，表示编译过程中，将移除所有的注释。`false`的话，保留所有的注释。 
    - noImplicitAny  
@@ -39,3 +41,6 @@
      是否检查有未使用的局部变量。为true的话就检查，为false的话就不检查。如果存在未使用的变量，就提示，但不会报错。
    - noUnusedParameters  
      是否检查有未使用的函数参数。为true的话就检查，为false的话就不检查。如果存在未使用的参数，就提示，但不会报错。
+   - outFile  
+     - 配置这个选项后，会将所有的编译后的ts文件放入一个js文件中。这样就省去我们引入多个文件的麻烦。  
+     - 属性值是文件路径，例如：`./dist/page.js`，就会将所有的编译后的ts文件的内容都放入dist目录下的page.js文件中。

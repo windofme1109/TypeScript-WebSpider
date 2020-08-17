@@ -389,27 +389,92 @@ function trainAnimal(animal: Bird | Dog) {
 // console.log(Week2[5] === 'Wed');
 
 // 函数泛型
-function join<T>(first: T, second: T) {
-    return `${first} ${second}`;
+// function join<T>(first: T, second: T) {
+//     return `${first} ${second}`;
+// }
+//
+// let ret = join<string>('1', '2');
+// // 1 2
+// console.log(ret);
+// // 11 22
+// let ret1 = join<number>(11, 22);
+// console.log(ret1);
+//
+// function join2<T, U>(first: T, second: U) {
+//     return `${first} ${second}`;
+// }
+// let ret2 = join2(1, '2');
+//
+// function join3<T>(first: T, second: T): T {
+//     return first;
+// }
+// let ret3 = join3<string>('aaa', '2');
+//
+// function map<T>(param: Array<T>) {
+//     return param;
+// }
+
+// 类中使用泛型
+class DataManager<T> {
+    constructor(private data: T[]) {
+        this.data = data;
+    }
+
+    getItem(index: number): T {
+        return this.data[index];
+    }
 }
 
-let ret = join<string>('1', '2');
-// 1 2
-console.log(ret);
-// 11 22
-let ret1 = join<number>(11, 22);
-console.log(ret1);
+const data = new DataManager<string>(['1', '2']);
+// 2
+console.log(data.getItem(1));
 
-function join2<T, U>(first: T, second: U) {
-    return `${first} ${second}`;
-}
-let ret2 = join2(1, '2');
+const data2 = new DataManager<number>([100, 200]);
+// 200
+console.log(data2.getItem(1));
 
-function join3<T>(first: T, second: T): T {
-    return first;
+// 对泛型进行约束
+interface Item {
+    name: string;
 }
-let ret3 = join3<string>('aaa', '2');
 
-function map<T>(param: Array<T>) {
-    return param;
+// 泛型继承了Item，则泛型中必须具有name这个属性
+class DataManager2<T extends Item> {
+    constructor(private data: T[]) {
+        this.data = data;
+    }
+
+    getItem(index: number): string {
+        return this.data[index].name;
+    }
 }
+
+const data3 = new DataManager2([
+    {
+        name: 'dell',
+    },
+]);
+
+// dell
+console.log(data3.getItem(0));
+
+// 使用基本类型对泛型进行约束
+class DataManager3<T extends number | string> {
+    constructor(private data: T[]) {
+        this.data = data;
+    }
+
+    getItem(index: number): T {
+        return this.data[index];
+    }
+}
+
+const data4 = new DataManager3<string>(['dell', 'lee']);
+// lee
+console.log(data4.getItem(1));
+
+function hello<T>(params: T): T {
+    return params;
+}
+
+const func: <T>(params: T) => T = hello;
