@@ -26,15 +26,36 @@
    - 使用tsc命令编辑后的js文件通常会和ts文件在同一个目录下，在实际的项目开发中，这是不合理的，我们最好将编译后的js文件放在一个单独的目录下，因此需要修改tsconfig.json文件。
    - 在`"compilerOptions"`字段下，将`"outDir"`的值设置为：`./build`，表示编译后的js文件放在与tsconfig同级的build目录下。
 
-7. 自动执行
+8. 自动执行
    - 生成接收文件后，我们需要执行js文件。同样我们也需要js文件更新后，就能立即执行。因此我们使用`nodemon`这个工具。 在package.json文件中的`scripts`中添加：`"start": "nodemon node ./build/crawler.js"`。表示，我们使用nodemon执行build目录下的crawler.js文件。
    - 由于nodemon监测的是整个项目，但是有一些文件不需要它去监测，比如说我们存储结果的course.json文件，我们一旦执行crawler.js文件，就会更新course.json文件，而course.json文件一旦跟新，又会触发nodemon执行crawler.js文件，此时course.json又会被更新，于是就处于无限循环之中。实际上，我们监测的主要是js文件。所以需要配置nodemon，使其忽略对course.接送文件的支持。
    - 在package.json文件中的`scripts`中添加：`"nodemonConfig": {"ignore": ["data/*"]},`，表示忽略data目录下所有文件。
 
-8. 并行执行`tsc -w`和`nodemon`
+9. 并行执行`tsc -w`和`nodemon`
    - 执行`tsc -w`和`nodemon`，必须开启两个终端，有没有同时执行（并行）这两个命令的方法呢？
    - 答案是有的，安装一个工具：concurrently，安装命令：`npm install concurrently -D`。在package.json文件中的`scripts`中添加：`"dev": "concurrently \"npm run dev:build\" \"npm run dev:start\""`。
    - concurrently的文档地址：https://www.npmjs.com/package/concurrently
    - 使用格式：
      1. 命令行：`concurrently "command1 arg" "command2 arg"`
      2. package.json: `"start": "concurrently \"command1 arg\" \"command2 arg\""`
+
+### 2. 使用express重构项目
+
+1. 使用express搭建一个服务器。所以要新建一个index.ts文件，这个文件是项目的入口文件，所以，我们要在package.json中去修改配置项：
+   ```json
+      {
+          "scripts": {
+             "dev:build": "tsc -w",
+             "dev:start": "nodemon  build/index.js",
+             "dev": "tsc && concurrently \"npm run dev:build\" \"npm run dev:start\""
+          }
+      }
+   ```
+   命令解释：
+   - `"dev:build": "tsc -w"`
+   - `"dev:start": "nodemon  build/index.js"`  
+     这个命令，表示执行build目录下的index.js文件。这个文件是我们项目的入口文件，使用nodemon去执行。
+   - ` "dev": "tsc && concurrently \"npm run dev:build\" \"npm run dev:start\""`  
+     为什么要在concurrently的前面加上tsc命令，因为如果我们直接并行的执行dev:build和dev:start这两个命令，由于是同时执行，TS还没有将index.ts文件编译完成，nodemon就会去执行index.js文件，此时还没有生成index.js文件，所以会提示找不到index.js文件这个错误。  
+     因此我们要在并行执行那两个命令之前，先对index.ts文件进行编译。  
+     使用&&连接两个命令，表示先执行tsc，再执行concurrently。

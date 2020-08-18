@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/crawler.ts",
     "dev:build": "tsc -w",
-    "dev:start": "nodemon  build/crawler.js",
+    "dev:start": "nodemon  build/index.js",
     "dev": "concurrently \"npm run dev:build\" \"npm run dev:start\""
   },
   "nodemonConfig": {
