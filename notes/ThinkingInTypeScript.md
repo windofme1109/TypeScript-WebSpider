@@ -824,4 +824,89 @@
  
 3. 总结：
    在项目开发中，最好还是使用ES6的模块化语法，要比命名空间更加清晰，使我们能够清楚的了解每个变量的来历，依赖关系。
-            
+
+### 13. 泛型中的 `keyof` 关键字
+
+1. `keyof` 关键字用于泛型中遍历一个对象的属性，进而将泛型类型限定为这个对象中的几个属性。
+
+2. 不使用 `keyof` 的例子：
+   ```typescript
+      interface Person {
+          name: string;
+          age: number;
+          gender: string;
+      }
+      
+      class Teacher {
+          constructor(private person: Person) {
+              this.person = person;
+          }
+      
+          getItem(key: string) {
+              if (key === 'name' || key === 'age' || key === 'gender') {
+                  return this.person[key];
+              }
+          }
+      }
+      
+      const teacher = new Teacher({
+          name: 'dell',
+          age: 25,
+          gender: 'male',
+      });
+      
+      const ret = teacher.getItem('name');
+   ```
+   在限定了key的情况下，ret的类型是：string | number | undefined  
+   为什么会有undefined呢，原因是，我们没有办法限定传入的参数key只能是name，number，或者是gender  
+   只能是传入后，进行检查，符合条件，返回相应的值，不符合条件，什么也不返回  
+   所以，如果我们传入了name，number，或者是gender之外的值，就会返回undefined，所以ret的类型会有undefined  
+
+3. 为了解决这种情况，我们引入 `keyof` 关键字
+   ```typescript
+      interface Person {
+          name: string;
+          age: number;
+          gender: string;
+      }
+      
+      class Teacher {
+          constructor(private person: Person) {
+              this.person = person;
+          }
+          
+          getItem<T extends keyof Person>(key: T): Person[T] {
+              return this.person[key];
+          }
+      }
+      
+      const teacher = new Teacher({
+          name: 'dell',
+          age: 25,
+          gender: 'male',
+      });
+      
+      const ret = teacher.getItem('name');
+      const ret2 = teacher.getItem('age');
+      const ret3 = teacher.getItem('gender');
+      // 没有的属性会报错
+      // const ret4 = teacher.getItem('id');
+
+   ```
+   keyof关键字表示，泛型T只能是Person中有的属性，等同于：
+   ```typescript
+      type T = 'name'
+      key: T;
+      Person[key];
+   ```
+   age和gender属性也如此。这样key也就被限制了属性范围，从而返回值也限定了类型。
+
+4. 拓展：`type`关键字可以定义任意类型，而不仅仅是`string`、`number`等类型。
+   ```typescript
+      // 自定义类型，将字符串：'name'赋值给NAME
+      type NAME = 'name';
+      // 将ts的类型限定为NAME，则ts的值只能是字符串：'name'
+      const ts: NAME = 'name';
+      // 将ts2的类型限定为NAME，赋其他值就会报错
+      // const ts2: NAME = 'dos';
+   ```
