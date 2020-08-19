@@ -12,7 +12,6 @@
 // const cheerio = require('cheerio');
 
 import superagent from 'superagent';
-import cheerio from 'cheerio';
 
 import path from 'path';
 import fs from 'fs';
@@ -48,10 +47,4 @@ class Crawler {
     }
 }
 
-const secret = 'secretKey';
-const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
-
-// 使用单例模式得到DellAnalyzer的示例
-const analyzer = DellAnalyzer.getInstance();
-
-const crawler = new Crawler(url, analyzer);
+export default Crawler;
