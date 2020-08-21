@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Controller, get } from './decorator';
+import { getResponseData } from '../utils/util';
 
 interface BodyRequest extends Request {
     body: {
@@ -11,8 +12,14 @@ interface BodyRequest extends Request {
 
 @Controller
 class LoginController {
-    @get('/login')
-    login() {}
+    @get('/logout')
+    logout(req: BodyRequest, res: Response) {
+        if (req.session) {
+            req.session.isLogin = undefined;
+            // 退出登录，直接返回成功的状态
+            res.json(getResponseData(true));
+        }
+    }
 
     @get('/')
     home(req: BodyRequest, res: Response) {
