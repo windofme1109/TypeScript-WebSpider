@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Controller, get } from './decorator';
+import { Controller, get, post } from './decorator';
 import { getResponseData } from '../utils/util';
 
 interface BodyRequest extends Request {
@@ -12,6 +12,32 @@ interface BodyRequest extends Request {
 
 @Controller
 class LoginController {
+    @post('/login')
+    login(req: BodyRequest, res: Response) {
+        const { password } = req.body;
+        // 使用cookie-session这个中间件以后
+        // request对象中就会有session这个对象
+        // 在我们通过cookieSession()配置后
+        // 就可以给session对象添加属性以及属性值，这个属性值会被加密，然后作为cookie，返回给前端
+        // 为了防止报错，我们首先判断request对象中是否存在session属性，在进行使用
+        const isLogin = req.session ? req.session.isLogin : undefined;
+        if (isLogin) {
+            // res.send('<h1>登录成功</h1>');
+            res.json(getResponseData(true));
+        } else {
+            if (password === '123' && req.session) {
+                // 首次登陆，isLogin必然是undefined状态
+                // 所以我们需要给session对象添加属性以及属性值，这个值会被加密，然后作为cookie，返回给前端
+                req.session.isLogin = password;
+                // res.send('<h1>登录成功</h1>');
+                res.json(getResponseData(true));
+            } else {
+                // res.send('<h1>登录失败</h1>');
+                res.json(getResponseData(null, '登录失败'));
+            }
+        }
+    }
+
     @get('/logout')
     logout(req: BodyRequest, res: Response) {
         if (req.session) {
