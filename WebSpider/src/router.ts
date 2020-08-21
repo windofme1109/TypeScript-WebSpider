@@ -27,27 +27,7 @@ const checkLogin = (req: BodyRequest, res: Response, next: NextFunction) => {
     }
 };
 
-router.get('/', function (req: BodyRequest, res: Response) {
-    const isLogin = req.session ? req.session.isLogin : undefined;
-    if (isLogin) {
-        res.send(`<body>
-    <div class="login">
-        <a href="/getData">获取数据</a>
-        <a href="/logout">退出</a>
-        <a href="/showData">展示数据</a>
-    </div>
-</body>`);
-    } else {
-        res.send(`<body>
-    <div class="login">
-        <form action="/login" method="post">
-            <input type="password" name="password">
-            <button type="submit">登录</button>
-        </form>
-    </div>
-</body>`);
-    }
-});
+router.get('/', function () {});
 
 router.get('/logout', function (req: BodyRequest, res: Response) {
     if (req.session) {

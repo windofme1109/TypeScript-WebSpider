@@ -19,15 +19,7 @@ var checkLogin = function (req, res, next) {
         res.json(util_1.getResponseData(null, '请登录后查看'));
     }
 };
-router.get('/', function (req, res) {
-    var isLogin = req.session ? req.session.isLogin : undefined;
-    if (isLogin) {
-        res.send("<body>\n    <div class=\"login\">\n        <a href=\"/getData\">\u83B7\u53D6\u6570\u636E</a>\n        <a href=\"/logout\">\u9000\u51FA</a>\n        <a href=\"/showData\">\u5C55\u793A\u6570\u636E</a>\n    </div>\n</body>");
-    }
-    else {
-        res.send("<body>\n    <div class=\"login\">\n        <form action=\"/login\" method=\"post\">\n            <input type=\"password\" name=\"password\">\n            <button type=\"submit\">\u767B\u5F55</button>\n        </form>\n    </div>\n</body>");
-    }
-});
+router.get('/', function () { });
 router.get('/logout', function (req, res) {
     if (req.session) {
         req.session.isLogin = undefined;

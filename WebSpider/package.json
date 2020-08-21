@@ -6,7 +6,8 @@
   "scripts": {
     "dev:build": "tsc -w",
     "dev:start": "nodemon ./build/index.js",
-    "dev": "tsc && concurrently \"npm run dev:build\" \"npm run dev:start\""
+    "dev": "tsc && concurrently \"npm run dev:build\" \"npm run dev:start\"",
+    "test": "tsc && node ./build/controller/LoginController.js"
   },
   "nodemonConfig": {
     "ignore": [
@@ -31,6 +32,7 @@
     "body-parser": "^1.19.0",
     "cookie-session": "^1.4.0",
     "express": "^4.17.1",
+    "reflect-metadata": "^0.1.13",
     "superagent": "^6.0.0"
   }
 }
