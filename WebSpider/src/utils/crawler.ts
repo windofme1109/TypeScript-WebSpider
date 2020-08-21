@@ -16,10 +16,10 @@ import superagent from 'superagent';
 import path from 'path';
 import fs from 'fs';
 
-import DellAnalyzer from './dellAnalyzer';
+import Analyzer from './analyzer';
 
 // 定义一个接口，来限定Analyzer这个对象中必须有analyze这个方法，analyze的参数类型和返回值类型也一同被确定
-export interface Analyzer {
+export interface AnalyzerStyle {
     analyze: (html: string, filePath: string) => string;
 }
 
