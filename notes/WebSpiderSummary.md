@@ -59,3 +59,6 @@
      为什么要在concurrently的前面加上tsc命令，因为如果我们直接并行的执行dev:build和dev:start这两个命令，由于是同时执行，TS还没有将index.ts文件编译完成，nodemon就会去执行index.js文件，此时还没有生成index.js文件，所以会提示找不到index.js文件这个错误。  
      因此我们要在并行执行那两个命令之前，先对index.ts文件进行编译。  
      使用&&连接两个命令，表示先执行tsc，再执行concurrently。
+
+2. express的类型文件 `.d.ts` 文件对类型的描述不准确，很多都是any，无法精确限制类型
+3. 当我们使用中间件时，对req或者res对象做出了修改，但是类型定义并没有改变
