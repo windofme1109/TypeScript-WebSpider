@@ -1,3 +1,5 @@
 /.idea/
 /WebSpider/node_modules/
 /demo-3/node_modules/
+/demo-3/.parcel-cache/
+/demo-4/node_modules/
