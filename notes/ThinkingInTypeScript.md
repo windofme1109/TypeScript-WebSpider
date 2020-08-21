@@ -910,3 +910,76 @@
       // 将ts2的类型限定为NAME，赋其他值就会报错
       // const ts2: NAME = 'dos';
    ```
+   
+   
+### 14. 装饰器（decorator）
+1. 类的装饰器
+   - 在不改变原有类结构的基础上，给类增加新的功能
+   - 装饰器是一个函数
+   - 装饰器函数接收的参数是类的构造方法
+   - 装饰是通过 @ 符号使用
+   - 示例代码：
+     ```typescript
+        /**
+         * 定义一个装饰器
+         * @param constructor
+         */
+        function testDecorator(constructor: any) {
+            // 将getName()绑定到构造方法的原型上
+            constructor.prototype.getName = () => {
+                console.log('Decorator');
+            };
+        }
+       // 使用装饰器
+        @testDecorator
+        class Test {}
+        
+        const test = new Test();
+        // 定义Test类时没有getName()方法，所以直接使用会报错，将test实例断言为any，就不报错了
+        (test as any).getName();
+     ```
+   - 可以给一个类设置多个装饰器，执行顺序是从下到上，即总是从距离那个类最近的装饰器开始执行。示例代码：
+     ```typescript
+        function testDecorator(constructor: any) {
+            console.log('Decorator');
+        }
+        
+        /**
+         *
+         * @param constructor
+         */
+        function testDecorator2(constructor: any) {
+            console.log('Decorator2');
+        }
+     
+        @testDecorator
+        @testDecorator2
+        class Test {}
+        // 输出
+        // Decorator2
+        // Decorator
+     ```
+     先执行装饰器testDecorator2，再执行testDecorator。
+   - 还可以给装饰器传入参数。做法是使用闭包。在将真正的装饰器函数作为返回值返回，从而外层函数可以接收参数，实现更多的功能。实例代码如下：
+     ```typescript
+        function testDecorator(flag: boolean) {
+            if (flag) {
+                return function (constructor: any) {
+                    // 将getName()绑定到构造方法的原型上
+                    constructor.prototype.getName = () => {
+                        console.log('Decorator');
+                    };
+                };
+            } else {
+                return function (constructor: any) {};
+            }
+        }
+     
+        // 使用
+        // 这种情况下，使用装饰器要加上 ()，并传入参数
+        @testDecorator(true)
+        class Test {}
+        const test = new Test();
+        // 定义Test类时没有getName()方法，所以直接使用会报错，将test实例断言为any，就不报错了
+        (test as any).getName();
+     ```
