@@ -45,7 +45,7 @@ function testDecorator2(constructor: any) {
 
 // @testDecorator
 // @testDecorator2
-// class Test {}
+// class Test1 {}
 
 // 给Test类的构造方法的原型上绑定了getName()方法
 // const test = new Test();

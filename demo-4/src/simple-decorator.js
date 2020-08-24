@@ -25,12 +25,13 @@ function testDecorator(flag) {
         return function (constructor) { };
     }
 }
-function testDecorator(constructor) {
-    constructor.prototype.getName = function () {
-        console.log('Decorator');
-    };
-    console.log('Decorator');
-}
+//
+// function testDecorator(constructor: any) {
+//     constructor.prototype.getName = () => {
+//         console.log('Decorator');
+//     };
+//     console.log('Decorator');
+// }
 /**
  *
  * @param constructor
@@ -41,20 +42,20 @@ function testDecorator2(constructor) {
     // };
     console.log('Decorator2');
 }
-// 第二种装饰器的使用形式：闭包将真正的函数作为返回值返回，从而外层函数可以接收参数，实现更多的功能
-// 这种情况下，使用装饰器要加上 ()
+// 第二种装饰器的使用形式：闭包将真正的装饰器函数作为返回值返回，从而外层函数可以接收参数，实现更多的功能
+// 这种情况下，使用装饰器要加上 ()，并传入参数
 // @testDecorator(true)
 // class Test {}
-var Test = /** @class */ (function () {
-    function Test() {
+// @testDecorator
+var Test1 = /** @class */ (function () {
+    function Test1() {
     }
-    Test = __decorate([
-        testDecorator,
+    Test1 = __decorate([
         testDecorator2
-    ], Test);
-    return Test;
+    ], Test1);
+    return Test1;
 }());
 // 给Test类的构造方法的原型上绑定了getName()方法
-var test = new Test();
+// const test = new Test();
 // 定义Test类时没有getName()方法，所以直接使用会报错，将test实例断言为any，就不报错了
-test.getName();
+// (test as any).getName();
