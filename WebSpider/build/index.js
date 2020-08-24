@@ -7,7 +7,8 @@ var express_1 = __importDefault(require("express"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var cookie_session_1 = __importDefault(require("cookie-session"));
 require("./controller/LoginController");
-var decorator_1 = require("./controller/decorator");
+require("./controller/CrawlerController");
+var router_1 = __importDefault(require("./router"));
 // import router from './router';
 // const express = require('express');
 var app = express_1.default();
@@ -34,7 +35,7 @@ app.use(function (req, res, next) {
     req.teacherName = 'dell';
     next();
 });
-app.use(decorator_1.router);
+app.use(router_1.default);
 app.listen(7001, function () {
     console.log('server is running');
 });

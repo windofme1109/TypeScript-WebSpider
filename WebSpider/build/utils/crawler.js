@@ -57,7 +57,7 @@ var Crawler = /** @class */ (function () {
         this._url = _url;
         this.analyzer = analyzer;
         // 生成存放课程信息的json文件的路径
-        this._resultFilePath = path_1.default.resolve(__dirname, '../data/course.json');
+        this._resultFilePath = path_1.default.resolve(__dirname, '../../data/course.json');
         this.initSpiderProcess();
     }
     Crawler.prototype.getRawHtml = function (url) {

@@ -25,7 +25,7 @@ export interface AnalyzerStyle {
 
 class Crawler {
     // 生成存放课程信息的json文件的路径
-    private _resultFilePath = path.resolve(__dirname, '../data/course.json');
+    private _resultFilePath = path.resolve(__dirname, '../../data/course.json');
 
     async getRawHtml(url: string) {
         const ret = await superagent.get(url);

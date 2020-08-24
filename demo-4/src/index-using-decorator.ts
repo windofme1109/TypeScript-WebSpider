@@ -28,21 +28,23 @@ function catchError(msg: string) {
     };
 }
 
-const userInfo: any = undefined;
+// const userInfo: any = undefined;
+//
+// class Test {
+//     @catchError('uerInfo.name 不存在')
+//     getName() {
+//         return userInfo.name;
+//     }
+//
+//     @catchError('userInfo.age 不存在')
+//     getAge() {
+//         return userInfo.age;
+//     }
+// }
+//
+// const test = new Test();
+//
+// test.getName();
+// test.getAge();
 
-class Test {
-    @catchError('uerInfo.name 不存在')
-    getName() {
-        return userInfo.name;
-    }
-
-    @catchError('userInfo.age 不存在')
-    getAge() {
-        return userInfo.age;
-    }
-}
-
-const test = new Test();
-
-test.getName();
-test.getAge();
+//
