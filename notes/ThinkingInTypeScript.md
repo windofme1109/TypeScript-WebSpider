@@ -912,6 +912,7 @@
    ```
    
    
+   
 ### 14. 装饰器（decorator）
 
 1. 类的装饰器
@@ -920,6 +921,7 @@
    - 装饰器是一个函数
    - 装饰器函数接收的参数是类的构造方法
    - 装饰是通过 @ 符号使用
+   - 类的装饰器是定义类的过程中，就会被执行/
    - 示例代码：
      ```typescript
         /**
@@ -993,3 +995,149 @@
 4. 属性的装饰器
 
 5. 参数的装饰器
+
+### 15. reflect-metadata与装饰器
+
+1. 参考资料：[JavaScript Reflect Metadata 详解](https://www.jianshu.com/p/653bce04db0b)
+
+2. reflect-metadata基本说明  
+   - 这个一个反射的模块。在Java等编程语言中，都有反射机制，在Java中，反射机制的作用是通过一个实例，获取这个类的方法、属性等。而TS中的反射，则是来获取究竟有哪些装饰器添加到这个类/方法上。
+   -简单来说，你可以通过装饰器来给类添加一些自定义的信息。然后通过反射将这些信息提取出来。当然你也可以通过反射来添加这些信息。
+   
+3. 几个概念
+   - `Metadata Key {Any}` 简写 k。元数据的 Key，对于一个对象来说，他可以有很多元数据，每一个元数据都对应有一个 Key。一个很简单的例子就是说，你可以在一个对象上面设置一个叫做 name 的 Key 用来设置他的名字，用一个 created time 的 Key 来表示他创建的时间。这个 Key 可以是任意类型。在后面会讲到内部本质就是一个 Map 对象。
+   - `Metadata Value {Any}` 简写 v。元数据的值，任意类型都行。
+   - `Target {Object}` 简写 t。表示要在这个对象上面添加元数据。
+   - `Property {String|Symbol}` 简写 p。用于设置在哪个属性上面添加元数据。大家可能会想，这个是干什么用的，不是可以在对象上面添加元数据了么？其实不仅仅可以在对象上面添加元数据，甚至还可以在对象的属性上面添加元数据。其实大家可以这样理解，当你给一个对象定义元数据的时候，相当于你是默认指定了 undefined 作为 Property。
+   
+4. 用法
+   - 先看一段示例代码：
+     ```typescript
+        // 直接通过import的方式进行引入
+        import 'reflect-metadata';
+        
+        @Reflect.metadata('name', 'A')
+        class A {
+            @Reflect.metadata('hello', 'world')
+            public hello(): string {
+                return 'hello world';
+            }
+        }    
+        // A
+        const v1 = Reflect.getMetadata('name', A);
+        // 
+        const v2 = Reflect.getMetadata('hello', new A());
+     ``` 
+   - 要使reflect-metadata这个模块，首先要进行安装：`npm install reflect-metadata --save`。然后直接导入：`import 'reflect-metadata';`
+   - `Reflect.metadata('name', 'A')`，表示在某个类上、属性或者方法上定义元数据。其中name表示元数据的key，A表示元数据的value。
+   - `Reflect.getMetadata('name', A)`，获得某个类上面的某个元数据。其中name表示元数据的key，A表示添加了元数据的类。
+
+   - 第二段代码：
+     ```typescript
+        @Reflect.metadata('name', 'A')
+        class A {
+            @Reflect.metadata('hello', 'world')
+            public hello(): string {
+                return 'hello world';
+            }
+        
+            @Reflect.metadata('name', 'hello')
+            hello2() {}
+        }
+        
+        // A
+        const v1 = Reflect.getMetadata('name', A);
+        // world
+        const v2 = Reflect.getMetadata('hello', new A(), 'hello');
+        
+        // console.log(v1);
+        console.log(v2);
+        
+        const objs = [A, new A(), A.prototype];
+        
+        const res = objs.map(obj => [
+            // 对类的装饰，都是定义在对象上面
+            Reflect.getMetadata('name', obj),
+            // 对类的属性或者方法的修饰，都是定义在类的原型上,并且以属性或者方法的 key 作为 property，也就是属性或者方法的名称
+            Reflect.getMetadata('name', obj, 'hello2'),
+            Reflect.getOwnMetadata('name', obj),
+            Reflect.getOwnMetadata('name', obj, 'hello2'),
+        ]);
+        
+        // [
+        //   [ 'A', undefined, 'A', undefined ],
+        //   [ undefined, 'hello', undefined, undefined ],
+        //   [ undefined, 'hello', undefined, 'hello' ]
+        // ]
+        console.log(res);
+     ```
+   - 使用Reflect.metadata()添加元数据，有以下几种情况：
+     - 对类的装饰，都是定义在对象上面
+     - 对类的属性或者方法的修饰，都是定义在类的原型上,并且以属性或者方法的 key 作为 property，也就是属性或者方法的名称。
+   - 查找元数据的方式也是通过原型链进行的。示例代码如下：
+     ```typescript
+        class B {
+            @Reflect.metadata('name', 'dell')
+            hello() {}
+        }
+        
+        const t1 = new B();
+        const t2 = new B();
+        
+        // 定义在实例上
+        Reflect.defineMetadata('otherName', 'world', t2, 'hello');
+        // 定义在类上
+        Reflect.defineMetadata('otherNameT1', 'China', B, 'greeting');
+        
+        // dell
+        console.log(Reflect.getMetadata('name', t1, 'hello'));
+        // undefined
+        console.log(Reflect.getMetadata('otherName', t1, 'hello'));
+        // world
+        console.log(Reflect.getMetadata('otherNameT1', B, 'greeting'));
+        
+        // dell
+        console.log(Reflect.getMetadata('name', t2, 'hello'));
+        // world
+        console.log(Reflect.getMetadata('otherName', t2, 'hello'));
+        
+        // undefined
+        console.log(Reflect.getOwnMetadata('name', t2, 'hello'));
+        // undefined
+        console.log(Reflect.getOwnMetadata('name', t1, 'hello'));
+        // world
+        console.log(Reflect.getOwnMetadata('otherName', t2, 'hello'));
+     ```
+   - 因为给类B的成员方法hello()添加了元数据，所以这个元数据被加到了B的原型上。
+   - 通过getMetadata()获取某个实例或者类的元数据，查找通过原型链的方式进行。以`Reflect.getMetadata('name', t1, 'hello')`为例，要查找添加在实例t1上的属性hello的元数据，其key为name，那么首先在实例t1上进行查找，没有这个元数据，则我们顺着原型链，去类B的原型上去查找，类B的原型上存在这个元数据，则返回这个元数据。
+   - `Reflect.defineMetadata('otherName', 'world', t2, 'hello');`，在实例t2上，定义一个元数据，key为otherName，value为world，添加元数据的属性是hello。根据后面测试的表现来看，这个没有添加到类B的原型上，而是添加到实例t2上面了。
+   - `Reflect.getMetadata('otherName', t1, 'hello');`，因为t1及其原型链上没有`otherName`这个元数据，所以得到的是`undefined`。
+   - `Reflect.getOwnMetadata('otherName', t2, 'hello')`，带了own，表示只去查找在实例上面的元数据。因为otherName定义在实例t2上，所以可以查找到，而name定义在原型上，所以查找不到。
+5. 主要API
+   
+   - metadata(k, v): (target, property?) => void  
+     **给类、属性或者方法添加元数据**
+     
+   - defineMetadata(k, v, t, p?): void  
+     **在对象上面定义元数据**
+     
+   - hasMetadata(k, t, p?): boolean  
+     **是否存在元数据**
+     
+   - hasOwnMetadata(k, t, p?): boolean  
+     **是否存在元数据（实例）**
+ 
+   - getMetadata(k, t, p?): any  
+     **获取元数据**
+     
+   - getOwnMetadata(k, t, p?): any  
+     **获取实例的元数据**
+     
+   - getMetadataKeys(t, p?): any[]  
+     **获取所有元数据的 Key**
+     
+   - getOwnMetadataKeys(t, p?): any[]  
+     获取所有元数据（实例）的 Key 
+     
+   - deleteMetadata(k, t, p?): boolean  
+     删除元数据
