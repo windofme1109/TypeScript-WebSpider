@@ -12,7 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var decorator_1 = require("./decorator");
+exports.CrawlerController = void 0;
+// import { get, use } from './decorator';
+var decorator_1 = require("../decorator");
 var util_1 = require("../utils/util");
 var analyzer_1 = __importDefault(require("../utils/analyzer"));
 var crawler_1 = __importDefault(require("../utils/crawler"));
@@ -26,6 +28,10 @@ var checkLogin = function (req, res, next) {
     else {
         res.json(util_1.getResponseData(null, '请登录后查看'));
     }
+};
+var test = function (req, res, next) {
+    console.log('test middleware');
+    next();
 };
 var CrawlerController = /** @class */ (function () {
     function CrawlerController() {
@@ -54,6 +60,7 @@ var CrawlerController = /** @class */ (function () {
     __decorate([
         decorator_1.get('/getData'),
         decorator_1.use(checkLogin),
+        decorator_1.use(test),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
@@ -66,7 +73,8 @@ var CrawlerController = /** @class */ (function () {
         __metadata("design:returntype", void 0)
     ], CrawlerController.prototype, "showData", null);
     CrawlerController = __decorate([
-        decorator_1.Controller
+        decorator_1.Controller('/api')
     ], CrawlerController);
     return CrawlerController;
 }());
+exports.CrawlerController = CrawlerController;

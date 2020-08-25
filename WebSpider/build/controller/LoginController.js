@@ -9,11 +9,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var decorator_1 = require("./decorator");
+exports.LoginController = void 0;
+// import { get, post } from './decorator';
+var decorator_1 = require("../decorator");
 var util_1 = require("../utils/util");
 var LoginController = /** @class */ (function () {
     function LoginController() {
     }
+    LoginController.prototype.isLogin = function (req, res) {
+        var isLogin = req.session ? req.session.isLogin : undefined;
+        console.log(isLogin);
+        if (isLogin) {
+            res.json(util_1.getResponseData(true));
+        }
+        else {
+            res.json(util_1.getResponseData(false));
+        }
+    };
     LoginController.prototype.login = function (req, res) {
         var password = req.body.password;
         // 使用cookie-session这个中间件以后
@@ -57,6 +69,12 @@ var LoginController = /** @class */ (function () {
         }
     };
     __decorate([
+        decorator_1.get('/isLogin'),
+        __metadata("design:type", Function),
+        __metadata("design:paramtypes", [Object, Object]),
+        __metadata("design:returntype", void 0)
+    ], LoginController.prototype, "isLogin", null);
+    __decorate([
         decorator_1.post('/login'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
@@ -75,7 +93,8 @@ var LoginController = /** @class */ (function () {
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "home", null);
     LoginController = __decorate([
-        decorator_1.Controller
+        decorator_1.Controller('/api')
     ], LoginController);
     return LoginController;
 }());
+exports.LoginController = LoginController;

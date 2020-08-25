@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Controller, get, use } from './decorator';
+
+// import { get, use } from './decorator';
+import { Controller, get, use } from '../decorator';
 import { getResponseData } from '../utils/util';
 import Analyzer from '../utils/analyzer';
 import Crawler from '../utils/crawler';
@@ -14,7 +16,11 @@ interface BodyRequest extends Request {
     };
 }
 
-const checkLogin = (req: BodyRequest, res: Response, next: NextFunction) => {
+const checkLogin = (
+    req: BodyRequest,
+    res: Response,
+    next: NextFunction
+): void => {
     const isLogin = req.session ? req.session.isLogin : undefined;
     if (isLogin) {
         next();
@@ -23,11 +29,17 @@ const checkLogin = (req: BodyRequest, res: Response, next: NextFunction) => {
     }
 };
 
-@Controller
-class CrawlerController {
+const test = (req: BodyRequest, res: Response, next: NextFunction) => {
+    console.log('test middleware');
+    next();
+};
+
+@Controller('/api')
+export class CrawlerController {
     @get('/getData')
     @use(checkLogin)
-    getData(req: BodyRequest, res: Response) {
+    @use(test)
+    getData(req: BodyRequest, res: Response): void {
         const secret = 'secretKey';
         const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
         // 使用单例模式得到DellAnalyzer的示例
@@ -40,7 +52,7 @@ class CrawlerController {
 
     @get('/showData')
     @use(checkLogin)
-    showData(req: BodyRequest, res: Response) {
+    showData(req: BodyRequest, res: Response): void {
         try {
             const filePath = path.resolve(__dirname, '../../data/course.json');
             const courseContent = fs.readFileSync(filePath, {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { Controller, get, post } from './decorator';
+// import { get, post } from './decorator';
+import { Controller, get, post } from '../decorator';
 import { getResponseData } from '../utils/util';
 
 interface BodyRequest extends Request {
@@ -10,8 +11,19 @@ interface BodyRequest extends Request {
     };
 }
 
-@Controller
-class LoginController {
+@Controller('/api')
+export class LoginController {
+    @get('/isLogin')
+    isLogin(req: BodyRequest, res: Response) {
+        const isLogin = req.session ? req.session.isLogin : undefined;
+        console.log(isLogin);
+        if (isLogin) {
+            res.json(getResponseData(true));
+        } else {
+            res.json(getResponseData(false));
+        }
+    }
+
     @post('/login')
     login(req: BodyRequest, res: Response) {
         const { password } = req.body;
