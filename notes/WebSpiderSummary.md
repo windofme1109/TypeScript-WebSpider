@@ -65,3 +65,9 @@
 
 ### 3. 装饰器（Decorator）在项目中的应用
 
+### 4. 在React中使用TypeScript
+
+1. 安装
+   - 在控制台输入：`npx create-react-app react-project-typescript --template typescript --use-npm`
+   - `--template typescript` 表示使用typescript作为项目的模板。
+   - `--use-npm` 表示使用npm安装项目的依赖。不加入这个参数，则默认使用yarn的方式安装项目的依赖。
