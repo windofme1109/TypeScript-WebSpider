@@ -61,9 +61,37 @@
      使用&&连接两个命令，表示先执行tsc，再执行concurrently。
 
 2. express的类型文件 `.d.ts` 文件对类型的描述不准确，很多都是any，无法精确限制类型
+   - 解决方法：定义一个接口，使之继承某一个类型，比如说是Request，然后在这个接口中定义我们需要限定的类型，比如说是body
+   - 使用时，直接使用这个接口即可。
+   - 示例代码：
+     ```typescript
+        interface BodyRequest extends Request {
+             body: {
+                // 任意属性
+                // 属性为字符串即可
+                [prop: string]: string | undefined;
+             };
+        }
+     ```
+   - BodyRequest 这个接口，继承了Reuqest，不仅具有Request类型的所有内容，同时我们还可以根据自己的需求，增加或者是覆写一下东西，然后使用这个新的BodyRequest对变量进行类型限定。
+   
 3. 当我们使用中间件时，对req或者res对象做出了修改，但是类型定义并没有改变
+   - 解决方法是，我们可以自定义一个`.d.ts`的类型文件，按照官方的声明格式，在里面添加我们需要限定的类型。TS会将相同的全局变量进行合并。例如：我们在项目的根路径下建立一个类型文件：`custom.d.ts`，内容如下：
+     ```typescript
+        /**
+          * 自定义的类型文件，用来扩展Express原本的类型定义
+          * 定义方式要与Express的类型定义文件相同
+          */
+        declare namespace Express {
+            interface Request {
+                     teacherName: string;
+            }
+        }
+     ```
+   - 定义方式与Express的官方类型定义文件相同，这样TS就会将其合并。这被称为类型融合，我们要找到express的核心的类型定义文件：`@types/express-serve-static-core/index.d.ts`，进入这个文件，仿照这个文件的声明方式进行声明。
 
 ### 3. 装饰器（Decorator）在项目中的应用
+
 
 ### 4. 在React中使用TypeScript
 

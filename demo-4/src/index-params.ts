@@ -1,7 +1,7 @@
 /**
  *
  * 参数装饰器
- * 数装饰器只能用来监视一个方法的参数是否被传入
+ * 参数装饰器只能用来监视一个方法的参数是否被传入
  */
 
 /**
@@ -16,9 +16,12 @@ function paramDecorator(target: any, method: string, paramIndex: number) {
 
 class Test {
     getInfo(@paramDecorator name: string, age: number) {
+        // Test { getInfo: [Function] } getInfo 0
         console.log(name, age);
     }
 }
 
 const test = new Test();
+
+// jack 20
 test.getInfo('jack', 20);

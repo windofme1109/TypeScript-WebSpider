@@ -1,7 +1,7 @@
 /**
  * 访问器的装饰器
  * 访问器指的是类中的getter和setter方法
- * 注意;TypeScript不允许同时装饰一个成员的get和set访问器。
+ * 注意：TypeScript不允许同时装饰一个成员的get和set访问器。
  * 取而代之的是，一个成员的所有装饰的必须应用在文档顺序的第一个访问器上。
  * 这是因为，在装饰器应用于一个属性描述符时，它联合了get和set访问器，而不是分开声明的。
  */
@@ -17,9 +17,18 @@ function visitorDecorator(
     key: string,
     descriptor: PropertyDescriptor
 ) {
-    // console.log(target);
-    // console.log(key);
-    // console.log(descriptor);
+    // Test5 {}
+
+    console.log(target);
+    // name
+    console.log(key);
+    // {
+    //   get: [Function: get],
+    //   set: [Function: set],
+    //   enumerable: false,
+    //   configurable: true
+    // }
+    console.log(descriptor);
     // descriptor.writable = false;
     descriptor.get = () => {
         return 'smith';
@@ -49,4 +58,6 @@ const test = new Test5('jack');
 // console.log(test.name);
 test.name = 'rose';
 test.name = 'curry';
+
+// smith
 console.log(test.name);
