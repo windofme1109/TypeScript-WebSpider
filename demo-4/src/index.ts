@@ -23,7 +23,7 @@ const v1 = Reflect.getMetadata('name', A);
 // world
 const v2 = Reflect.getMetadata('hello', new A(), 'hello');
 
-console.log(v1);
+// console.log(v1);
 // console.log(v2);
 
 const objs = [A, new A(), A.prototype];
@@ -56,24 +56,27 @@ const t2 = new B();
 
 // 定义在实例上
 Reflect.defineMetadata('otherName', 'world', t2, 'hello');
+Reflect.defineMetadata('otherName', ['USA', 'UK'], t2, 'hello');
+console.log(Reflect.getMetadata('otherName', t2, 'hello'));
+
 // 定义在类上
 Reflect.defineMetadata('otherNameT1', 'China', B, 'greeting');
 
 // dell
-console.log(Reflect.getMetadata('name', t1, 'hello'));
-// undefined
-console.log(Reflect.getMetadata('otherName', t1, 'hello'));
-// world
-console.log(Reflect.getMetadata('otherNameT1', B, 'greeting'));
-
-// dell
-console.log(Reflect.getMetadata('name', t2, 'hello'));
-// world
-console.log(Reflect.getMetadata('otherName', t2, 'hello'));
-
-// undefined
-console.log(Reflect.getOwnMetadata('name', t2, 'hello'));
-// undefined
-console.log(Reflect.getOwnMetadata('name', t1, 'hello'));
-// world
-console.log(Reflect.getOwnMetadata('otherName', t2, 'hello'));
+// console.log(Reflect.getMetadata('name', t1, 'hello'));
+// // undefined
+// console.log(Reflect.getMetadata('otherName', t1, 'hello'));
+// // world
+// console.log(Reflect.getMetadata('otherNameT1', B, 'greeting'));
+//
+// // dell
+// console.log(Reflect.getMetadata('name', t2, 'hello'));
+// // world
+// console.log(Reflect.getMetadata('otherName', t2, 'hello'));
+//
+// // undefined
+// console.log(Reflect.getOwnMetadata('name', t2, 'hello'));
+// // undefined
+// console.log(Reflect.getOwnMetadata('name', t1, 'hello'));
+// // world
+// console.log(Reflect.getOwnMetadata('otherName', t2, 'hello'));
