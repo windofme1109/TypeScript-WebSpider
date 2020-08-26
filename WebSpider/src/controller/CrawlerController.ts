@@ -45,8 +45,8 @@ export class CrawlerController {
         // 使用单例模式得到DellAnalyzer的示例
         const analyzer = Analyzer.getInstance();
         const crawler = new Crawler(url, analyzer);
-
-        res.json(getResponseData(true));
+        const ret = getResponseData<ResponseResult.getData>(true);
+        res.json(ret);
         // res.send('成功获取数据！');
     }
 
@@ -58,9 +58,13 @@ export class CrawlerController {
             const courseContent = fs.readFileSync(filePath, {
                 encoding: 'utf-8',
             });
-            res.json(getResponseData(JSON.parse(courseContent)));
+
+            const ret = getResponseData<ResponseResult.showData>(
+                JSON.parse(courseContent)
+            );
+            res.json(ret);
         } catch (e) {
-            res.json(getResponseData(null, '数据不存在'));
+            res.json(getResponseData<boolean>(false, '数据不存在'));
         }
     }
 }

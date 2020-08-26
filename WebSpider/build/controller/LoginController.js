@@ -48,7 +48,7 @@ var LoginController = /** @class */ (function () {
             }
             else {
                 // res.send('<h1>登录失败</h1>');
-                res.json(util_1.getResponseData(null, '登录失败'));
+                res.json(util_1.getResponseData(false, '登录失败'));
             }
         }
     };

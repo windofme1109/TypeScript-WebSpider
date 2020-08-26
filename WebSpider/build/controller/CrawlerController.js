@@ -42,7 +42,8 @@ var CrawlerController = /** @class */ (function () {
         // 使用单例模式得到DellAnalyzer的示例
         var analyzer = analyzer_1.default.getInstance();
         var crawler = new crawler_1.default(url, analyzer);
-        res.json(util_1.getResponseData(true));
+        var ret = util_1.getResponseData(true);
+        res.json(ret);
         // res.send('成功获取数据！');
     };
     CrawlerController.prototype.showData = function (req, res) {
@@ -51,10 +52,11 @@ var CrawlerController = /** @class */ (function () {
             var courseContent = fs_1.default.readFileSync(filePath, {
                 encoding: 'utf-8',
             });
-            res.json(util_1.getResponseData(JSON.parse(courseContent)));
+            var ret = util_1.getResponseData(JSON.parse(courseContent));
+            res.json(ret);
         }
         catch (e) {
-            res.json(util_1.getResponseData(null, '数据不存在'));
+            res.json(util_1.getResponseData(false, '数据不存在'));
         }
     };
     __decorate([

@@ -70,7 +70,7 @@ export default class Analyzer implements AnalyzerStyle {
             // $()可以接收一个DOM元素，并将其转换为jQuery元素，这样就可以使用jQuery方法了
             // find()方法作用是：在当前元素集合中选择符合选择器规则的元素集合
             const title = $(element).find('.course-desc').text();
-            courseInfo.push({ title, count: 100 });
+            courseInfo.push({ title, count: Math.ceil(Math.random() * 100) });
         });
 
         return {

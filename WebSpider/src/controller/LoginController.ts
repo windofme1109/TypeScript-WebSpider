@@ -18,9 +18,9 @@ export class LoginController {
         const isLogin = req.session ? req.session.isLogin : undefined;
         console.log(isLogin);
         if (isLogin) {
-            res.json(getResponseData(true));
+            res.json(getResponseData<ResponseResult.isLogin>(true));
         } else {
-            res.json(getResponseData(false));
+            res.json(getResponseData<ResponseResult.isLogin>(false));
         }
     }
 
@@ -35,17 +35,19 @@ export class LoginController {
         const isLogin = req.session ? req.session.isLogin : undefined;
         if (isLogin) {
             // res.send('<h1>登录成功</h1>');
-            res.json(getResponseData(true));
+            res.json(getResponseData<boolean>(true));
         } else {
             if (password === '123' && req.session) {
                 // 首次登陆，isLogin必然是undefined状态
                 // 所以我们需要给session对象添加属性以及属性值，这个值会被加密，然后作为cookie，返回给前端
                 req.session.isLogin = password;
                 // res.send('<h1>登录成功</h1>');
-                res.json(getResponseData(true));
+                res.json(getResponseData<ResponseResult.login>(true));
             } else {
                 // res.send('<h1>登录失败</h1>');
-                res.json(getResponseData(null, '登录失败'));
+                res.json(
+                    getResponseData<ResponseResult.login>(false, '登录失败')
+                );
             }
         }
     }
@@ -55,7 +57,7 @@ export class LoginController {
         if (req.session) {
             req.session.isLogin = undefined;
             // 退出登录，直接返回成功的状态
-            res.json(getResponseData(true));
+            res.json(getResponseData<ResponseResult.logout>(true));
         }
     }
 
