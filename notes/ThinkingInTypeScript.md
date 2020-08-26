@@ -992,14 +992,251 @@
    - 方法的装饰器用于对类中成员方法的装饰。
    - 示例代码：
      ```typescript
-
+        
+        /**
+         *
+         * @param target 如果是修饰的是普通方法，target对应的是类的原型对象 prototype，如果是静态方法，则target对应的是构造方法 constructor
+         * @param key 被修饰的方法的名称，是字符串
+         * @param descriptor 属性描述符，用来设定类的属性和方法的一些行为，
+         * writable: 比如说能否被重写
+         * enumerable: 能否枚举
+         * value: 被修饰的熟悉的值
+         * configurable: 是否可以通过Object.defineProperty对对象再次配置
+         */
+        function getNameDecorator(
+            target: any,
+            key: string,
+            descriptor: PropertyDescriptor
+        ) {
+            // 设置writable为false，表示被修饰的方法不可以被覆写
+            // descriptor.writable = false;
+            console.log(target, key, descriptor);
+        
+            // 我们修饰的是类中的普通函数，所以descriptor的value的值为一个函数
+            // 因此我们使用函数，进行覆写
+            descriptor.value = function () {
+                return 'decorators';
+            };
+        }    
+        
+        class Test {
+            name: string;
+            constructor(name: string) {
+                this.name = name;
+            }
+        
+             @getNameDecorator
+             static getName() {
+                 // return this.name;
+                 return '123';
+            }
+     }
      ```
-
+   - 函数装饰器接收三个参数：
+     - **target**  
+       如果是修饰的是普通方法，target对应的是类的原型对象 prototype，如果是静态方法，则target对应的是构造方法 constructor
+     - **key**  
+       被修饰的方法的名称，是字符串
+     - **descriptor**  
+       属性描述符，用来设定类的属性和方法的一些行为，例如：  
+       writable: 比如说能否被重写  
+       enumerable: 能否枚举  
+       value: 被修饰的熟悉的值  
+       configurable: 是否可以通过Object.defineProperty对对象再次配置
+   - 实际上，常用的是前两个参数。
+   - 还可以给函数装饰器传递参数。示例代码如下所示：
+     ```typescript
+        function getNameDecoratorWithParam(params: string) {
+            return function (target: any, key: string, descriptor: PropertyDescriptor) {
+                descriptor.value = function () {
+                    return 'decorator ' + params;
+                };
+            };
+        }
+        
+        class Test {
+            name: string;
+            constructor(name: string) {
+                this.name = name;
+            }
+            // 带参数的装饰器
+            @getNameDecoratorWithParam('jakky')
+            getName() {
+                return this.name;
+            }
+        }
+        
+        const test = new Test('jack');
+        test.getName();
+     ```
+   - 使用工厂模式，将真正的装饰器函数作为返回值返回，也就是闭包。所以，我们在使用时，要先传入参数，使得外层函数先执行，而闭包中，保留着对params的引用。
+   - 函数的装饰器的执行时机：装饰器函数装饰了类中的方法，在创建类的时候就会被使用。
+   - descriptor中的value实际上是对方法的引用，因此，可以将方法进行覆写。
+   
 3. 访问器的装饰器
+   - 访问器值得是getter和setter方法。
+   - TypeScript不允许同时装饰一个成员的get和set访问器。取而代之的是一个成员的所有装饰的必须应用在文档顺序的第一个访问器上。原因是：在装饰器应用于一个属性描述符时，它联合了get和set访问器，而不是分开声明的。
+   - 示例代码：
+     ```typescript
+        /**
+         * 访问器的装饰器的参数和方法装饰器的一样
+         * @param target 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+         * @param key 属性的名称
+         * @param descriptor 描述符
+         */
+        function visitorDecorator(
+            target: any,
+            key: string,
+            descriptor: PropertyDescriptor
+        ) {
+            // Test5 {}
+            console.log(target);
+            // name
+            console.log(key);
+            // {
+            //   get: [Function: get],
+            //   set: [Function: set],
+            //   enumerable: false,
+            //   configurable: true
+            // }
+            console.log(descriptor);
+            // descriptor.writable = false;
+            descriptor.get = () => {
+                return 'smith';
+            };  
+        }
+        
+        class Test5 {
+            private _name: string;
+            constructor(name: string) {
+                this._name = name;
+            }
+        
+            @visitorDecorator
+            set name(name: string) {
+                this._name = name;
+            }
+            get name() {
+                return this._name;
+            }
+        }
+        
+        const test = new Test5('jack');
+        // console.log(test.name);
+        test.name = 'rose';
+        test.name = 'curry';
+        
+        // smith
+        console.log(test.name);
+     ```
+   - 访问器的装饰器接收三个参数：
+     - **target**  
+       对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+     - **key**  
+       被修饰的访问器的名称，也就是getter或者setter的名称
+     - **descriptor**  
+       属性的描述符
+   - 访问器的装饰器实际上与方法的装饰器类似，都是对方法的装饰。装饰器函数接收的参数都是一样的，区别是第三个参数descriptor的内容。
+   - 访问器的装饰器的执行时机：装饰器函数装饰了类中的访问器，在创建类的时候就会被使用。
 
 4. 属性的装饰器
+   - 这里所说的属性，指的是类中的成员属性或者静态属性。
+   - 示例代码：
+     ```typescript
+        /**
+         *
+         * @param target 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+         * @param key 成员的名字
+         */
+        function nameDecorator(target: any, key: string): any {
+            // console.log(target, key);
+            // 虽然参数中没有传入属性描述符，但是我们可以自定义一个新的属性描述符，替换原来的属性描述符
+            const descriptor: PropertyDescriptor = {
+                // 设置其writable为false，则不可以改变这个属性的值
+                writable: false,
+            };
+        
+            return descriptor;
+        }        
+        class Test {
+            @nameDecorator
+            name = 'dell';
+        }
+        
+        const test = new Test();
+        // 当我们在装饰器中，设置其描述符中的writale为false，就不能改写name属性了
+        test.name = 'rose';
+        // TypeError: Cannot assign to read only property 'name' of object '#<Test>'
+        console.log(test.name);
+     ```
+   - 属性装饰器的参数是：
+     - **target**  
+       对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+     - **key**  
+       成员的名字
+   
+   - 我们可以设置新的属性描述符（PropertyDescriptor）来覆盖属性原来的描述符，进而对属性进行约束。
+   - 如果在装饰器中对类中的某个属性进行设置，实际上我们修改的是原型上面的属性，而不是实例上的属性：
+     ```typescript
+        
+        
+        function nameDecorator(target: any, key: string): any {
+             // target是类的原型，因此我们这样修改的实际上是原型的属性
+             // 没有办法直接修改实例属性
+             target[key] = 'rose';
+        }
+        
+        class Test {
+            @nameDecorator
+            name = 'dell';
+        }
+        
+        const test = new Test();
+        // name是实例属性
+        // dell
+        // console.log(test.name);
+        
+        // 想要通过实例，访问原型上的属性，只能通过__proto__去访问
+        // 由于实例上，直接访问__proto__会报错，所以首先将其断言为any，在进行访问
+        // rose
+        console.log((test as any).__proto__.name);
+     ```
+   - 也就是说，属性装饰器，无法修改实例属性。
 
 5. 参数的装饰器
+   - 这里的参数指的是成员方法的参数。
+   - 参数装饰器只能用来监视一个方法的参数是否被传入。
+   - 示例代码：
+     ```typescript
+        /**
+         *
+         * @param target 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+         * @param method 被装饰的参数所在的函数
+         * @param paramIndex 被修饰的参数的位置
+         */
+        function paramDecorator(target: any, method: string, paramIndex: number) {
+            // Test { getInfo: [Function] } getInfo 0
+            console.log(target, method, paramIndex);
+        }
+        
+        class Test {
+            getInfo(@paramDecorator name: string, age: number) {
+                console.log(name, age);
+            }
+        }
+        
+        const test = new Test();
+        // jack 20
+        test.getInfo('jack', 20);
+     ```
+   - 参数装饰器的接收参数是：
+     - **target**  
+     对于静态成员来说是类的构造函数，对于实例成员是类的原型对象
+     - **method**  
+     被装饰的参数所在的函数，实际上就是字符串
+     - **paramIndex**  
+     被修饰的参数的位置
+
 
 ### 15. reflect-metadata与装饰器
 
