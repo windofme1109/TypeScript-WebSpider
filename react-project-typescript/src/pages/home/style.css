@@ -1,15 +1,22 @@
 .home-page {
-    width: 350px;
-    margin: 100px auto;
+    width: 100%;
+    /*margin: 100px auto;*/
     border: 1px solid #666;
     padding: 20px;
     border-radius: 5px;
 }
-
+.home-page .user-action {
+    width: 350px;
+    margin: 0 auto;
+}
 .home-page .ant-btn:nth-child(n-1) {
     margin-right: 15px;
 }
 
 .home-page .ant-btn:nth-child(1) {
     margin-left: 20px;
+}
+
+.home-page .charts {
+    margin: 30px 0 30px 0;
 }

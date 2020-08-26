@@ -3,6 +3,7 @@ import { Button, Form, Input, message } from 'antd';
 import { Redirect } from 'react-router-dom';
 import axios, { AxiosResponse } from 'axios';
 
+import instance from '../../request';
 import './style.css';
 
 const layout = {
@@ -36,10 +37,10 @@ class Login extends Component {
     onFinish = (values: Values) => {
         // console.log('Success:', values);
         const { password } = values;
-        axios.post('/api/login', { password }).then((res: AxiosResponse) => {
-            let { data } = res;
+        instance.post('/api/login', { password }).then((res: AxiosResponse) => {
+            let data: ResponseResult.login = res.data;
             console.log('login', data);
-            if (data.data) {
+            if (data) {
                 this.setState({
                     login: true,
                 });
