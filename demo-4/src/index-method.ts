@@ -38,28 +38,28 @@ function getNameDecoratorWithParam(params: string) {
     };
 }
 
-class Test {
-    name: string;
-    constructor(name: string) {
-        this.name = name;
-    }
+// class Test {
+//     name: string;
+//     constructor(name: string) {
+//         this.name = name;
+//     }
 
-    // @getNameDecorator
-    // static getName() {
-    //     // return this.name;
-    //     return '123';
-    // }
+// @getNameDecorator
+// static getName() {
+//     // return this.name;
+//     return '123';
+// }
 
-    // @getNameDecorator
+// @getNameDecorator
 
-    // 带参数的装饰器
-    @getNameDecoratorWithParam('jakky')
-    getName() {
-        return this.name;
-    }
-}
+// 带参数的装饰器
+//     @getNameDecoratorWithParam('jakky')
+//     getName() {
+//         return this.name;
+//     }
+// }
 
-const test = new Test('jack');
+// const test = new Test('jack');
 
 // 设置属性描述符中的writable为false，表示被修饰的方法不可以被覆写
 // error TS2339: Property 'writable' does not exist on type 'PropertyDecorator'.
@@ -67,4 +67,4 @@ const test = new Test('jack');
 //     return '567';
 // };
 
-console.log(test.getName());
+// console.log(test.getName());

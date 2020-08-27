@@ -31,14 +31,14 @@ class Test {
     name = 'dell';
 }
 
-const test = new Test();
+// const test = new Test();
 // name是实例属性
 // console.log(test.name);
 
 // 想要通过实例，访问原型上的属性，只能通过__proto__去访问
 // 由于实例上，直接访问__proto__会报错，所以首先将其断言为any，在进行访问
 // rose
-console.log((test as any).__proto__.name);
+// console.log((test as any).__proto__.name);
 // TypeError: Cannot assign to read only property 'name' of object '#<Test>'
 // 当我们在装饰器中，设置其描述符中的writale为false，就不能改写name属性了
 // test.name = 'rose';

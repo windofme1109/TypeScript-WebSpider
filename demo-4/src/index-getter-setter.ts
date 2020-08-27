@@ -54,10 +54,10 @@ class Test5 {
     }
 }
 
-const test = new Test5('jack');
+// const test = new Test5('jack');
 // console.log(test.name);
-test.name = 'rose';
-test.name = 'curry';
-
-// smith
-console.log(test.name);
+// test.name = 'rose';
+// test.name = 'curry';
+//
+// // smith
+// console.log(test.name);

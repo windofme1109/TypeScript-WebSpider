@@ -14,14 +14,14 @@ function paramDecorator(target: any, method: string, paramIndex: number) {
     console.log(target, method, paramIndex);
 }
 
-class Test {
-    getInfo(@paramDecorator name: string, age: number) {
-        // Test { getInfo: [Function] } getInfo 0
-        console.log(name, age);
-    }
-}
-
-const test = new Test();
-
-// jack 20
-test.getInfo('jack', 20);
+// class Test {
+//     getInfo(@paramDecorator name: string, age: number) {
+//         // Test { getInfo: [Function] } getInfo 0
+//         console.log(name, age);
+//     }
+// }
+//
+// const test = new Test();
+//
+// // jack 20
+// test.getInfo('jack', 20);

@@ -14,25 +14,25 @@
 // 在函数前面加一个new，表示这是一个构造方法
 // 泛型T继承了这个构造方法，表示泛型T的构造函数，可以接收任意数量，任意类型的参数
 // 而装饰器函数的constructor参数，也被约束为泛型T，进而表示constructor为构造方法
-function testDecorator<T extends new (...args: Array<any>) => any>(
-    constructor: T
-) {
-    return class extends constructor {
-        name = 'rose';
+// function testDecorator<T extends new (...args: Array<any>) => any>(
+//     constructor: T
+// ) {
+//     return class extends constructor {
+//         name = 'rose';
+//
+//         getName() {
+//             return this.name;
+//         }
+//     };
+// }
 
-        getName() {
-            return this.name;
-        }
-    };
-}
-
-@testDecorator
-class Test {
-    name: string;
-    constructor(name: string) {
-        this.name = name;
-    }
-}
+// @testDecorator
+// class Test {
+//     name: string;
+//     constructor(name: string) {
+//         this.name = name;
+//     }
+// }
 
 // 上面这中装饰器的方式，必须声明示例为any，而且不会出现语法提示
 // const test: any = new Test('jack');
