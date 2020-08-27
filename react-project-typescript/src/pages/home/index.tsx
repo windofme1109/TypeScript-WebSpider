@@ -32,7 +32,7 @@ export default class Home extends Component {
         courseData: {},
     };
 
-    getOption = () => {
+    getOption: () => echarts.EChartOption = () => {
         const { courseData } = this.state;
 
         const xAxisData: Array<string> = [];
@@ -64,13 +64,13 @@ export default class Home extends Component {
             });
         }
         // 获获取每个课程的用户数据
-        const chartOptions = {
+        return {
             title: {
                 text: '课程实时学习人数',
             },
-            tooltip: {
-                trigger: 'axis',
-            },
+            // tooltip: {
+            //     trigger: 'axis',
+            // },
             legend: {
                 data: legendData,
             },
@@ -95,7 +95,6 @@ export default class Home extends Component {
             },
             series: singleCourseInfo,
         };
-        return chartOptions;
     };
 
     componentDidMount() {
