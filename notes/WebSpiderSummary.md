@@ -88,18 +88,198 @@
             }
         }
      ```
-   - 定义方式与Express的官方类型定义文件相同，这样TS就会将其合并。这被称为类型融合，我们要找到express的核心的类型定义文件：`@types/express-serve-static-core/index.d.ts`，进入这个文件，仿照这个文件的声明方式进行声明。
+   - 定义方式与Express的官方类型定义文件相同，这样TS就会将其合并。这被称为类型融合，我们要找到express的核心的类型定义文件：`@types/express-serve-static-core/index.d.ts`，进入这个文件，**仿照这个文件的声明方式进行声明**。
 
 ### 3. 装饰器（Decorator）在项目中的应用
 
 1. 装饰器主要用在后端的路由处理中。将一些公共的处理流程，比如：检查是否登录、指定请求方法等，这些功能都可以抽出来，放到装饰器中去做。
 2. 想要用好装饰器，必须和反射机制结合。在TypeScript中，要使用reflect-metadata这个模块实现反射机制。
 3. 基本流程就是通过反射机制，获取定义在某个类、方法上的装饰器以及元数据（使用defineMetadata()函数定义），根据元数据和装饰器，进行相应的操作。
-4. 
-
+4. 在项目中使用的装饰器主要是类装饰器和方法装饰器。
+5. 对后端进行拆分，按照MVC的模式组织代码。统一将前端请求放在Controller层中进行处理。我们只需要搞定路由处理函数即可。我们以登录接口为例来说明如何使用装饰器实现Controller。
+   - 安装`reflect-metadata`模块：`npm install reflect-metadata --save`
+   - 新建两个目录：`controller`和`decorator`。其中`decorator`目录用来存放装饰器函数。
+   - 在decorator目录下，新建decorator.ts文件，这个文件用来定义装饰器，并且给相应的方法添加元数据。
+     ```typescript
+        import 'reflect-metadata';
+        import { RequestHandler } from 'express';
+        
+        /**
+         * 这个函数的主要作用是将path和method作为元数据添加到某个成员方法中
+         * @param method
+         */
+        function requestDecorator(method: string) {
+            return function (path: string) {
+                // 真正的装饰器
+                /**
+                 * 修饰的是普通方法，target是类的原型对象 prototype，修饰的是静态方法，则target是类的constructor
+                 */
+                return function (target: any, key: string) {
+                    Reflect.defineMetadata('path', path, target, key);
+                    Reflect.defineMetadata('method', method, target, key);
+                };
+            };
+        }
+        
+        /**
+         * 添加多个中间件
+         * @param middleware
+         */
+        export function use(middleware: RequestHandler) {
+            return function (target: any, key: string) {
+                // 要添加多个中间件，所有metadataValue必须是数组的形式
+     // 判断中间件数组是否存在，不存在，说明是第一次赋值，则赋值为空数组，否则就直接获取中间数组
+                const mws: Array<any> = Reflect.getMetadata('middlewares', target, key)
+                    ? Reflect.getMetadata('middlewares', target, key)
+                    : [];
+        
+                // 将新的中间件推入数组中
+                mws.push(middleware);
+                Reflect.defineMetadata('middlewares', mws, target, key);
+                
+            };
+        }
+        export const get = requestDecorator('get');
+        export const post = requestDecorator('post');
+     ```
+     因此，我们可以给类的成员方法添加装饰器。使用如下：
+     ```typescript
+        import { post, get, use } from '../decorator/request-backup';
+        @get('/isLogin')
+        isLogin(req: BodyRequest, res: Response) {}
+        
+        @post('/login')
+        login(req: BodyRequest, res: Response) {}
+     
+         
+        @get('/getData')
+        @use(test)
+        @use(print)
+        getData(req: BodyRequest, res: Response): void {}
+     ```
+     test和print是我们自定义的中间件。
+   - 在decorator目录下，新建controller.ts文件，这个文件实现一个类装饰器，作用有：
+     - 获取定义在类中所有成员方式上的元数据和装饰器。
+     - 生成路由，包括路径、方法和处理逻辑以及对中间件的处理。
+     ```typescript
+        import 'reflect-metadata';
+        import { Router } from 'express';
+        
+        enum RequestMethods {
+            get = 'get',
+            post = 'post',
+        }
+       
+        const router = Router();
+        
+        /**
+         * root 参数，是父路径，而Controller内的路由处理函数的装饰器，接收的参数是子路径，二者拼接形成完整的请求路径
+         * @param root
+         * @constructor
+         */
+        export function ControllerBackup(root: string) {
+            return function (target: new (...args: any[]) => any) {
+                // 成员方法都定义在类的原型上
+                const targetPrototype = target.prototype;
+                for (let key in targetPrototype) {
+                    const path = Reflect.getMetadata('path', targetPrototype, key);
+                    const finalPath = root === '/' ? path : `${root}${path}`;
+                    // 获取定义在某个成员方式上的方法的元数据
+                    const method: RequestMethods = Reflect.getMetadata(
+                        'method',
+                        targetPrototype,
+                        key
+                    );
+                    // 获取定义在某个成员方式上的中间件元数据
+                    const middlewares = Reflect.getMetadata(
+                        'middlewares',
+                        targetPrototype,
+                        key
+                    );
+                    const handle = targetPrototype[key];
+                    if (finalPath && method) {
+                        if (middlewares && middlewares.length) {
+                            // 保证中间件数组一定存在
+                            router[method](finalPath, ...middlewares, handle);
+                        } else {
+                            router[method](finalPath, handle);
+                        }
+                    }
+                }
+            };
+        }
+        
+        export default router;
+     ```
+     这个装饰器是给类使用的，同时还可以接收一个根路径参数，使用如下：
+     ```typescript
+        import { ControllerBackup } from '../decorator/controller-backup';
+        @ControllerBackup('/api')
+        export class LoginController {}
+     ```
+   
 ### 4. 在React中使用TypeScript
 
 1. 安装
    - 在控制台输入：`npx create-react-app react-project-typescript --template typescript --use-npm`
    - `--template typescript` 表示使用typescript作为项目的模板。
    - `--use-npm` 表示使用npm安装项目的依赖。不加入这个参数，则默认使用yarn的方式安装项目的依赖。
+   
+2. 书写组件的文件的后缀是`.tsx`。
+
+3. 函数组件的限定类型是`React.FC`，如下所示：
+   ```tsx
+        import React, { FC } from 'react';
+   
+        export default const App: React.FC = () => {
+            return (
+                <div className="main">
+                    <HashRouter>
+                        <Switch>
+                            <Route path="/login" component={Login} />
+                            <Route path="/" component={Home} />
+                        </Switch>
+                    </HashRouter>
+                </div>
+            );
+        };
+   ```
+
+4. 函数组件结合hooks可以实现类组件的效果。
+5. 在类组件中，想要限定类型，可以使用泛型。
+   ```tsx
+      import { FormProps } from 'antd/lib/form/Form';
+      import React, {Component} from 'react' ;
+      interface Props {
+          form: FormProps;
+      }
+      
+      export class Test extends Component<Props> {
+          render() {
+              let from = this.props.form;
+              return <div></div>;
+          }
+      }
+   ```
+   通过泛型的形式，明确了Test组件接收的props参数的类型，也就是说，props里面会有表单这个参数，这样TS既能给出提示，又能进行检查。
+
+6. 学会去找模块提供的类型定义。有很多第三方的模块，如antd，express等，有现成的声明文件，里面具有很多类型。因此，为了提高代码的健壮性和可读性，减少程序出错的机率，我们需要进入模块的声明文件中寻找我们需要的类型。一般而言，我们首先寻找后缀是`.d.ts`的声明文件，在这些声明文件中去寻找。
+
+7. 模块书写的小技巧
+   - 我们定义了一个decorator的模块，目录结构如下：
+     ```tsx
+        |-- controller
+            |-- controller.ts
+        |-- request
+            |-- request.ts
+        |-- index.ts 
+        |-- method.ts
+     ```
+   - 其中，controller.ts和request.ts向外导出若干变量和函数。其他模块如果要使用一个变量，可能就得这样：`import Controller from '../../decorator/controller''`，就要定位到具体文件。如果文件的层级比较深，那么这种引入的方式非常麻烦。
+   - 为了解决这个问题，我们可以设置一个入口文件，也就是在decorator这个模块的根目录下，建立`index.ts`文件，使用`export from`语法，将这个模块需要对外导出的变量和函数，统一从index.ts中导出。代码如下：
+     ```typescript
+        export * from './controller/controller'
+        export * from './request/request'
+     ```
+   - `export-from` 用于聚集模块。但不能在直接使用。例如在index.js里`export { a } from 'b.js'`, 变量a在index.js里无法使用。相
+   - 其他模块引入了decorator模块的内容时，会首先进入index.ts文件中进行查找。我们在`index.ts`中聚集了decorator模块中所有的对外暴露的模块和变量，因此TS能轻易找到我们需要的内容。
