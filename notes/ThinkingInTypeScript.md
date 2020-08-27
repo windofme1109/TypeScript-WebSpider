@@ -987,7 +987,65 @@
         // 定义Test类时没有getName()方法，所以直接使用会报错，将test实例断言为any，就不报错了
         (test as any).getName();
      ```
-
+   - 给装饰器的参数指定类型。在前面的类装饰器中，我们都指定其参数——constructor的类型为any。但是我们最好能精确限定constructor的类型为构造函数，指定的方式有两种，通过泛型指定和直接指定。
+     - 泛型指定
+       ```typescript
+          function testDecoratorTwo<T extends new (...args: any[]) => any>(target: T) {
+            // console.log(target.prototype);
+        
+            return class extends target {
+                school = 'bupt';
+                getInfo = () => {
+                    return this.school;
+                };
+            };
+        }
+        
+          // @testDecorator
+          @testDecoratorTwo
+          class NewTest {
+              // 成员属性必须实例化以后才能使用
+              name = 'aaa';
+              age = 20;
+              // 成员方法则定义在构造函数的原型上
+              getName() {
+                console.log('123');
+              }
+          }
+        
+          const nt = new NewTest();
+          nt.getName();
+          // bupt
+          console.log((nt as any).getInfo());
+       ```
+       `(...args: any[]) => any`表示这是一个函数，`...args`在函数的参数中使用，表示剩余参数，将一个或者多个参数，装进args这个数组中。`any[]`表示`args`这个数组中元素的类型的`any`，也就是说，这个函数可以接收任意类型，任意数量的参数。函数的返回值的类型是`any`。  
+       在函数前面加一个`new`，表示这是一个构造方法。  
+       泛型T继承了这个构造方法，表示泛型T的构造函数，可以接收任意数量，任意类型的参数。
+       而装饰器函数的constructor参数，也被约束为泛型T，进而表示constructor为构造方法。
+     - 直接指定
+       ```typescript
+          function testDecorator(target: new (...args: any[]) => any) {
+              console.log(target.prototype);
+          
+              for (let key in target.prototype) {
+                  const method = target.prototype[key];
+                  method();
+              }
+          }
+          @testDecorator
+          class NewTest {
+              // 成员属性必须实例化以后才能使用
+              name = 'aaa';
+              age = 20;
+              // 成员方法则定义在构造函数的原型上
+              getName() {
+                  console.log('123');
+              }
+          }
+          
+          const nt = new NewTest();
+       ```
+       直接指定是将前面所说的构造函数类型：`(...args: any[]) => any`，直接约束类装饰器的参数。这样比较简单。
 2. 方法的装饰器
    - 方法的装饰器用于对类中成员方法的装饰。
    - 示例代码：
