@@ -8,7 +8,8 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var cookie_session_1 = __importDefault(require("cookie-session"));
 require("./controller/LoginController");
 require("./controller/CrawlerController");
-var router_1 = __importDefault(require("./router"));
+// import router from './router';
+var controller_backup_1 = __importDefault(require("./decorator/controller-backup"));
 // import router from './router';
 // const express = require('express');
 var app = express_1.default();
@@ -35,7 +36,7 @@ app.use(function (req, res, next) {
     req.teacherName = 'dell';
     next();
 });
-app.use(router_1.default);
+app.use(controller_backup_1.default);
 app.listen(7001, function () {
     console.log('server is running');
 });

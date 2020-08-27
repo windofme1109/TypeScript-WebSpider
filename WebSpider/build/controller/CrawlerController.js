@@ -14,7 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CrawlerController = void 0;
 // import { get, use } from './decorator';
-var decorator_1 = require("../decorator");
+// import { Controller, get, use } from '../decorator';
+var controller_backup_1 = require("../decorator/controller-backup");
+var request_backup_1 = require("../decorator/request-backup");
 var util_1 = require("../utils/util");
 var analyzer_1 = __importDefault(require("../utils/analyzer"));
 var crawler_1 = __importDefault(require("../utils/crawler"));
@@ -33,9 +35,16 @@ var test = function (req, res, next) {
     console.log('test middleware');
     next();
 };
+var print = function (req, res, next) {
+    console.log('自定义中间件！！！！！！！！');
+    next();
+};
+// @Controller('/api')
+// @ControllerBackup
 var CrawlerController = /** @class */ (function () {
     function CrawlerController() {
     }
+    // @use(checkLogin)
     CrawlerController.prototype.getData = function (req, res) {
         var secret = 'secretKey';
         var url = "http://www.dell-lee.com/typescript/demo.html?secret=" + secret;
@@ -46,6 +55,7 @@ var CrawlerController = /** @class */ (function () {
         res.json(ret);
         // res.send('成功获取数据！');
     };
+    // @use(checkLogin)
     CrawlerController.prototype.showData = function (req, res) {
         try {
             var filePath = path_1.default.resolve(__dirname, '../../data/course.json');
@@ -60,22 +70,21 @@ var CrawlerController = /** @class */ (function () {
         }
     };
     __decorate([
-        decorator_1.get('/getData'),
-        decorator_1.use(checkLogin),
-        decorator_1.use(test),
+        request_backup_1.get('/getData'),
+        request_backup_1.use(test),
+        request_backup_1.use(print),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], CrawlerController.prototype, "getData", null);
     __decorate([
-        decorator_1.get('/showData'),
-        decorator_1.use(checkLogin),
+        request_backup_1.get('/showData'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], CrawlerController.prototype, "showData", null);
     CrawlerController = __decorate([
-        decorator_1.Controller('/api')
+        controller_backup_1.ControllerBackup('/api')
     ], CrawlerController);
     return CrawlerController;
 }());

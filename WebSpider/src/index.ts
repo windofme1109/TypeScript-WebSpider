@@ -4,8 +4,8 @@ import cookieSession from 'cookie-session';
 
 import './controller/LoginController';
 import './controller/CrawlerController';
-import router from './router';
-
+// import router from './router';
+import router from './decorator/controller-backup';
 // import router from './router';
 // const express = require('express');
 const app = express();

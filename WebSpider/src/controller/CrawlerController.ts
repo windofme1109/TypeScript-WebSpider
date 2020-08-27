@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
 // import { get, use } from './decorator';
-import { Controller, get, use } from '../decorator';
+// import { Controller, get, use } from '../decorator';
+import { ControllerBackup } from '../decorator/controller-backup';
+import { post, get, use } from '../decorator/request-backup';
 import { getResponseData } from '../utils/util';
 import Analyzer from '../utils/analyzer';
 import Crawler from '../utils/crawler';
@@ -34,11 +36,19 @@ const test = (req: BodyRequest, res: Response, next: NextFunction) => {
     next();
 };
 
-@Controller('/api')
+const print = (req: BodyRequest, res: Response, next: NextFunction) => {
+    console.log('自定义中间件！！！！！！！！');
+    next();
+};
+
+// @Controller('/api')
+// @ControllerBackup
+@ControllerBackup('/api')
 export class CrawlerController {
+    // @use(checkLogin)
     @get('/getData')
-    @use(checkLogin)
     @use(test)
+    @use(print)
     getData(req: BodyRequest, res: Response): void {
         const secret = 'secretKey';
         const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
@@ -50,8 +60,8 @@ export class CrawlerController {
         // res.send('成功获取数据！');
     }
 
+    // @use(checkLogin)
     @get('/showData')
-    @use(checkLogin)
     showData(req: BodyRequest, res: Response): void {
         try {
             const filePath = path.resolve(__dirname, '../../data/course.json');

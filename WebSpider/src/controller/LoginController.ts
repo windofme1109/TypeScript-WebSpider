@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 // import { get, post } from './decorator';
-import { Controller, get, post } from '../decorator';
+// import { Controller, get, post } from '../decorator';
+
+import { ControllerBackup } from '../decorator/controller-backup';
+import { post, get } from '../decorator/request-backup';
 import { getResponseData } from '../utils/util';
 
 interface BodyRequest extends Request {
@@ -11,7 +14,9 @@ interface BodyRequest extends Request {
     };
 }
 
-@Controller('/api')
+// @Controller('/api')
+// @ControllerBackup
+@ControllerBackup('/api')
 export class LoginController {
     @get('/isLogin')
     isLogin(req: BodyRequest, res: Response) {

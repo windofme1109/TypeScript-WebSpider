@@ -11,8 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginController = void 0;
 // import { get, post } from './decorator';
-var decorator_1 = require("../decorator");
+// import { Controller, get, post } from '../decorator';
+var controller_backup_1 = require("../decorator/controller-backup");
+var request_backup_1 = require("../decorator/request-backup");
 var util_1 = require("../utils/util");
+// @Controller('/api')
+// @ControllerBackup
 var LoginController = /** @class */ (function () {
     function LoginController() {
     }
@@ -69,31 +73,31 @@ var LoginController = /** @class */ (function () {
         }
     };
     __decorate([
-        decorator_1.get('/isLogin'),
+        request_backup_1.get('/isLogin'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "isLogin", null);
     __decorate([
-        decorator_1.post('/login'),
+        request_backup_1.post('/login'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "login", null);
     __decorate([
-        decorator_1.get('/logout'),
+        request_backup_1.get('/logout'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "logout", null);
     __decorate([
-        decorator_1.get('/'),
+        request_backup_1.get('/'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "home", null);
     LoginController = __decorate([
-        decorator_1.Controller('/api')
+        controller_backup_1.ControllerBackup('/api')
     ], LoginController);
     return LoginController;
 }());
