@@ -283,3 +283,4 @@
      ```
    - `export-from` 用于聚集模块。但不能在直接使用。例如在index.js里`export { a } from 'b.js'`, 变量a在index.js里无法使用。相
    - 其他模块引入了decorator模块的内容时，会首先进入index.ts文件中进行查找。我们在`index.ts`中聚集了decorator模块中所有的对外暴露的模块和变量，因此TS能轻易找到我们需要的内容。
+   - 实际上，我们观察node_modules中的模块，入口文件都是`index.js`，这个模块需要导出的内容，都在index.js文件中。这样我们在使用的时候，多数情况下，直接是：`import from '模块名';`，而不用定位到具体的目录下去引入。
