@@ -1,12 +1,13 @@
 ## tsconfig.json文件配置说明
 1. 如果我们直接执行`tsc demo.ts`命令，会在同级目录下生成demo.js文件。在这种情况下，并不会直接读取tsconfig.json里面的配置项。
 
-2. 我们如果只执行`tsc`命令，首先会去读取tsconfig.json里面的配置项，如果存在`include`字段，则会去编译这个字段指定的文件，否则会默认编译当前目录下所有的ts文件。同时海湖读取其他的配置项，如`compilerOptions`，就是配置编译过程的一些选项。
+2. 我们如果只执行`tsc`命令，首先会去读取tsconfig.json里面的配置项，如果存在`include`字段，则会去编译这个字段指定的文件，否则会默认编译当前目录下所有的ts文件。同时还会读取其他的配置项，如`compilerOptions`，就是配置编译过程的一些选项。
 
 ## tsconfig.json字段详解
 1. 参考：
    - [tsconfig.json 中文版](https://www.tslang.cn/docs/handbook/tsconfig-json.html)
    - [tsconfig.json 英文版](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html)
+   - [编译选项](https://www.tslang.cn/docs/handbook/compiler-options.html)
 2. include  
    要编译哪些ts文件。字段值为数组，数组元素为ts文件路径。
 3. exclude  
@@ -44,3 +45,25 @@
    - outFile  
      - 配置这个选项后，会将所有的编译后的ts文件放入一个js文件中。这样就省去我们引入多个文件的麻烦。  
      - 属性值是文件路径，例如：`./dist/page.js`，就会将所有的编译后的ts文件的内容都放入dist目录下的page.js文件中。
+   - declaration
+     - 是否生成 `.d.ts` 类型声明文件，默认为 `false`，不生成类型声明文件，设置为 `true`，生成类型声明文件。
+   - moduleResolution
+     - 决定如何处理模块。值为 `Node` 或者是 `Classic`（默认）。`Node` 对应的是 Node.js 的模块解析机制。而 `Classic` 是 TypeScript 的默认的解析策略。现在，它存在的理由主要是为了向后兼容，如果 module 字段设置的值为 `AMD`、`System`、 `ES2015` 三者之一，则 moduleResolution 默认为 `Classic`。详细说明请见：[模块解析
+](https://www.tslang.cn/docs/handbook/module-resolution.html)
+   - allowSyntheticDefaultImports
+     - 允许从没有设置默认导出的模块中默认导入。这并不影响代码的输出，仅为了类型检查。
+     - 为布尔值。当 module 设置为 `system` 或者 `esModuleInterop` 且 module 不为 `es2015` 和 `esnext` 两者之一时，默认为 false，其余情况设置为 `true` 才起作用。
+   - jsx
+     - 在 `.tsx` 中启用对jsx语法的支持，值有三个，说明如下表所示：
+     
+     模式|输入|输出|输出文件扩展名
+     |:---:|:---:|:---:|:---:|
+     preserve|`<div />`|`<div />`|`.jsx`
+     react|`<div />`|`React.createElement("div")`|`.js`
+     react-native|`<div />`|`<div />`|`.js`
+     
+     - `preserve` 表示不会对jsx语法进行编译，保持所有的 jsx，并编译为jsx文件。而 `react` 表示调用 React.createElement() 方法创建 HTML 元素，生成 js 文件。`react-native` 相当于preserve，它也保留了所有的JSX，但是输出文件的扩展名是.js。
+     - 详情请参考：[JSX](https://www.tslang.cn/docs/handbook/jsx.html)
+   - target 
+     - 指定ECMAScript目标版本 `ES3`（默认）， 可选的值有：`ES5`， `"ES6"/ "ES2015"`， `ES2016`， `ES2017`或 `ESNext`。
+   
